@@ -116,7 +116,7 @@
       "type": "text",
       "id": "badge_text",
       "label": "Urgency Badge Text",
-      "default": "⚡ FLASH SALE ENDING SOON"
+      "default": "FLASH SALE ENDING SOON"
     },
     {
       "type": "text",
@@ -139,28 +139,30 @@
       "id": "timer_mode",
       "label": "Timer Mode",
       "options": [
-        { "value": "evergreen", "label": "Evergreen Rolling Timer (Resets daily for maximum urgency)" },
+        { "value": "evergreen", "label": "Evergreen Rolling Timer" },
         { "value": "fixed", "label": "Fixed End Date" }
       ],
       "default": "evergreen"
     },
     {
-      "type": "number",
+      "type": "range",
       "id": "evergreen_hours",
+      "min": 1,
+      "max": 48,
+      "step": 1,
+      "unit": "h",
       "label": "Evergreen Duration (Hours)",
-      "default": 12,
-      "info": "Countdown resets every X hours for each visitor"
+      "default": 12
     },
     {
       "type": "text",
       "id": "target_end_date",
       "label": "Fixed End Date (ISO 8601)",
-      "default": "2026-12-31T23:59:59",
-      "info": "Format: YYYY-MM-DDTHH:MM:SS (Used only if timer mode is Fixed)"
+      "default": "2026-12-31"
     },
     {
       "type": "header",
-      "content": "Coupon & Call-to-Action"
+      "content": "Coupon and Call-to-Action"
     },
     {
       "type": "text",
@@ -181,7 +183,7 @@
     },
     {
       "type": "header",
-      "content": "Styling & Colors"
+      "content": "Styling and Colors"
     },
     {
       "type": "color",
