@@ -148,6 +148,38 @@
               </div>
             </div>
           </div>
+        {%- else -%}
+          {%- comment -%} Fallback placeholder cards when no product is assigned in Theme Editor yet {%- endcomment -%}
+          <div class="bundle-product-card" data-product-id="demo_{{ forloop.index }}" data-block-id="{{ block.id }}" {{ block.shopify_attributes }}>
+            <span class="bundle-product-card__badge">{{ block.settings.badge_label | default: 'BESTSELLER' }}</span>
+            <div class="bundle-product-card__media">
+              {%- capture placeholder_name -%}product-{{ forloop.index | modulo: 6 | plus: 1 }}{%- endcapture -%}
+              {{ placeholder_name | placeholder_svg_tag: 'bundle-product-card__placeholder' }}
+            </div>
+            <div class="bundle-product-card__info">
+              <div class="bundle-product-card__rating">
+                <span class="stars">★★★★★</span>
+                <span class="rating-val">4.9</span>
+                <span class="reviews-count">({{ block.settings.review_count | default: '1,240+' }})</span>
+              </div>
+              <h3 class="bundle-product-card__title">Sample Bundle Product {{ forloop.index }}</h3>
+              <div class="bundle-product-card__price-row">
+                <span class="bundle-product-card__price" data-base-price="3800">$38.00</span>
+                <s class="bundle-product-card__compare-price">$48.00</s>
+              </div>
+              <div class="bundle-product-card__variants">
+                <input type="hidden" data-variant-select value="mock_var_{{ forloop.index }}" data-price="3800">
+              </div>
+              <div class="bundle-product-card__action">
+                <button type="button" class="bundle-product-card__btn-add" data-bundle-quick-add>+ Add to Bundle</button>
+                <div class="bundle-product-card__qty-control is-hidden" data-bundle-qty-control>
+                  <button type="button" class="bb-qty-btn bb-qty-minus" data-qty-minus aria-label="Decrease">&minus;</button>
+                  <span class="bb-qty-count" data-qty-count>1</span>
+                  <button type="button" class="bb-qty-btn bb-qty-plus" data-qty-plus aria-label="Increase">&#43;</button>
+                </div>
+              </div>
+            </div>
+          </div>
         {%- endif -%}
       {%- endfor -%}
     </div>

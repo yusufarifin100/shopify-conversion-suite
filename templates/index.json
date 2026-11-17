@@ -1,0 +1,69 @@
+{
+  "sections": {
+    "countdown_banner": {
+      "type": "countdown-timer",
+      "settings": {
+        "display_style": "hero",
+        "badge_text": "⚡ FLASH SALE ENDING SOON",
+        "heading": "Limited-Time VIP Savings Event",
+        "subheading": "Unlock up to 30% off when you build your custom bundle today. Free shipping included over $75.",
+        "timer_mode": "evergreen",
+        "evergreen_hours": 12,
+        "discount_code": "BUNDLE30",
+        "button_text": "Claim Offer Now",
+        "bg_gradient_start": "#0f172a",
+        "bg_gradient_end": "#1e293b",
+        "text_color": "#ffffff",
+        "accent_color": "#10b981",
+        "padding_top": 52,
+        "padding_bottom": 52
+      }
+    },
+    "bundle_builder": {
+      "type": "bundle-builder",
+      "blocks": {
+        "item_1": {
+          "type": "product_item",
+          "settings": {
+            "badge_label": "BESTSELLER",
+            "review_count": "1,420+"
+          }
+        },
+        "item_2": {
+          "type": "product_item",
+          "settings": {
+            "badge_label": "POPULAR",
+            "review_count": "890+"
+          }
+        },
+        "item_3": {
+          "type": "product_item",
+          "settings": {
+            "badge_label": "DERM PICK",
+            "review_count": "2,110+"
+          }
+        }
+      },
+      "block_order": [
+        "item_1",
+        "item_2",
+        "item_3"
+      ],
+      "settings": {
+        "eyebrow": "🎁 BUILD YOUR BUNDLE & SAVE BIG",
+        "heading": "Buy More, Save More Bundle",
+        "subheading": "Mix and match any items below. The more you add, the more you save! Free US Shipping included on bundles over $75.",
+        "tier_1_qty": 2,
+        "tier_1_discount": 10,
+        "tier_2_qty": 3,
+        "tier_2_discount": 20,
+        "tier_3_qty": 4,
+        "tier_3_discount": 30
+      }
+    }
+  },
+  "order": [
+    "countdown_banner",
+    "bundle_builder"
+  ]
+}

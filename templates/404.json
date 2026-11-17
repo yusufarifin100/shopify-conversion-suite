@@ -1,0 +1,15 @@
+{
+  "sections": {
+    "main": {
+      "type": "countdown-timer",
+      "settings": {
+        "heading": "404 - Page Not Found",
+        "subheading": "The page you requested does not exist, but our Flash Sale is still live!",
+        "button_text": "Continue Shopping"
+      }
+    }
+  },
+  "order": [
+    "main"
+  ]
+}
