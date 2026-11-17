@@ -1,0 +1,13 @@
+{
+  "sections": {
+    "bundle_builder": {
+      "type": "bundle-builder",
+      "settings": {
+        "heading": "Buy More, Save More Bundle"
+      }
+    }
+  },
+  "order": [
+    "bundle_builder"
+  ]
+}
