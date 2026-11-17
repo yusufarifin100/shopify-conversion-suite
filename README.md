@@ -1,7 +1,13 @@
 # 🚀 shopify-conversion-suite
 ### Full-Stack High-Conversion Marketing Toolkit & Shopify App (OS 2.0)
 
+[![Vercel Deployment](https://img.shields.io/badge/Live%20Demo-Vercel-black?style=for-the-badge&logo=vercel)](https://shopify-conversion-suite-peach.vercel.app)
+[![GitHub Repository](https://img.shields.io/badge/GitHub-Repository-181717?style=for-the-badge&logo=github)](https://github.com/yusufarifin100/shopify-conversion-suite)
+
 > Engineered specifically for high-growth direct-to-consumer (DTC) brands obsessed with **Conversion Rate Optimization (CRO)**, **Average Order Value (AOV)**, and frictionless shopping experiences.
+
+👉 **Live Interactive Storefront Demo:** [https://shopify-conversion-suite-peach.vercel.app](https://shopify-conversion-suite-peach.vercel.app)  
+👉 **Live Merchant Command Center:** [https://shopify-conversion-suite-peach.vercel.app/admin](https://shopify-conversion-suite-peach.vercel.app/admin)
 
 ---
 
