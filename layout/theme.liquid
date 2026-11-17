@@ -1,0 +1,100 @@
+<!doctype html>
+<html class="no-js" lang="{{ request.locale.iso_code }}">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="theme-color" content="#0f172a">
+    <link rel="canonical" href="{{ canonical_url }}">
+
+    <title>{{ page_title }} &ndash; {{ shop.name }}</title>
+
+    {%- if page_description -%}
+      <meta name="description" content="{{ page_description | escape }}">
+    {%- endif -%}
+
+    {{ content_for_header }}
+
+    <!-- Conversion Suite Core Stylesheets -->
+    {{ 'cart-drawer.css' | asset_url | stylesheet_tag }}
+
+    <style>
+      :root {
+        --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      }
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: var(--font-body);
+        color: #111827;
+        background-color: #ffffff;
+      }
+      /* Demo Navigation Header */
+      .site-header {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background: #ffffff;
+        border-bottom: 1px solid #e5e7eb;
+        padding: 0.875rem 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .site-logo {
+        font-size: 1.25rem;
+        font-weight: 800;
+        color: #0f172a;
+        text-decoration: none;
+        letter-spacing: -0.02em;
+      }
+      .cart-trigger-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: #f1f5f9;
+        border: 1px solid #e2e8f0;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 0.875rem;
+        color: #0f172a;
+        transition: background 0.2s;
+      }
+      .cart-trigger-btn:hover {
+        background: #e2e8f0;
+      }
+      .cart-trigger-btn .badge {
+        background: #0f172a;
+        color: #fff;
+        padding: 0.1rem 0.45rem;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- Top Announcement / Site Header -->
+    <header class="site-header">
+      <a href="/" class="site-logo">ConversionSuite™</a>
+      <button type="button" class="cart-trigger-btn" data-cart-drawer-trigger aria-label="Open Cart">
+        {% render 'icon-cart' %}
+        <span>Cart</span>
+        <span class="badge" data-cart-drawer-count>{{ cart.item_count }}</span>
+      </button>
+    </header>
+
+    <!-- Main Content -->
+    <main id="MainContent" role="main">
+      {{ content_for_layout }}
+    </main>
+
+    <!-- Slide-Out AJAX Cart Drawer Snippet -->
+    {% render 'cart-drawer' %}
+
+    <!-- Cart Drawer Script -->
+    <script src="{{ 'cart-drawer.js' | asset_url }}" defer="defer"></script>
+  </body>
+</html>

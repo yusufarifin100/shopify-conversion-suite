@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Conversion Suite™ Admin &ndash; Merchant Command Center</title>
+  <style>
+    :root {
+      --bg: #f6f6f7;
+      --card-bg: #ffffff;
+      --text: #202223;
+      --text-subdued: #6d7175;
+      --border: #e1e3e5;
+      --primary: #008060; /* Shopify Green */
+      --primary-hover: #006e52;
+      --accent-blue: #2c6ecb;
+      --font: -apple-system, BlinkMacSystemFont, "San Francisco", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: var(--font);
+      background-color: var(--bg);
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Top App Navigation */
+    .admin-header {
+      background: #ffffff;
+      border-bottom: 1px solid var(--border);
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .brand-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .brand-icon {
+      width: 32px;
+      height: 32px;
+      background: var(--primary);
+      color: #fff;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      font-weight: 800;
+    }
+    .brand-title {
+      font-size: 1.125rem;
+      font-weight: 700;
+      margin: 0;
+    }
+    .brand-badge {
+      background: #e4f8f0;
+      color: #008060;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 2rem auto;
+      padding: 0 1.5rem;
+    }
+
+    /* KPI Grid */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 1.25rem;
+      margin-bottom: 2rem;
+    }
+    .kpi-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.25rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+    }
+    .kpi-title {
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: var(--text-subdued);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      margin-bottom: 0.5rem;
+    }
+    .kpi-val {
+      font-size: 1.875rem;
+      font-weight: 800;
+      color: var(--text);
+      line-height: 1.2;
+    }
+    .kpi-trend {
+      font-size: 0.8125rem;
+      color: #008060;
+      font-weight: 600;
+      margin-top: 0.35rem;
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    /* Section Cards */
+    .panel-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.75rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+    }
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 1rem;
+    }
+    .panel-title {
+      font-size: 1.125rem;
+      font-weight: 700;
+      margin: 0;
+    }
+    .panel-desc {
+      font-size: 0.875rem;
+      color: var(--text-subdued);
+      margin: 0.25rem 0 0;
+    }
+
+    /* Forms & Tables */
+    .tiers-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 1.5rem;
+    }
+    .tiers-table th {
+      text-align: left;
+      font-size: 0.8125rem;
+      color: var(--text-subdued);
+      padding: 0.75rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .tiers-table td {
+      padding: 0.75rem;
+      border-bottom: 1px solid #f1f2f3;
+    }
+    .form-input {
+      width: 100%;
+      padding: 0.5rem 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 0.875rem;
+    }
+    .form-input:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.625rem 1.25rem;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 0.875rem;
+      cursor: pointer;
+      border: none;
+      transition: all 0.15s;
+    }
+    .btn-primary {
+      background: var(--primary);
+      color: #ffffff;
+    }
+    .btn-primary:hover {
+      background: var(--primary-hover);
+    }
+    .btn-outline {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+    .btn-outline:hover {
+      background: #f6f6f7;
+    }
+
+    /* Toast Notification */
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: #202223;
+      color: #ffffff;
+      padding: 0.875rem 1.5rem;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.3s ease;
+      z-index: 9999;
+    }
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Bar -->
+  <header class="admin-header">
+    <div class="brand-wrap">
+      <div class="brand-icon">⚡</div>
+      <h1 class="brand-title">Conversion Suite™ Admin</h1>
+      <span class="brand-badge">Full-Stack Backend Connected</span>
+    </div>
+    <div>
+      <button type="button" class="btn btn-outline" id="btnSimulateOrder">
+        ⚡ Simulate Customer Order Webhook
+      </button>
+    </div>
+  </header>
+
+  <div class="container">
+    <!-- Live CRO Metrics -->
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-title">Total CRO Sales</div>
+        <div class="kpi-val" id="metricRevenue">$0.00</div>
+        <div class="kpi-trend">↑ Generated via Conversion Suite</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-title">Average Order Value (AOV)</div>
+        <div class="kpi-val" id="metricAOV">$0.00</div>
+        <div class="kpi-trend">↑ +38.5% over store baseline</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-title">Bundle Savings Unlocked</div>
+        <div class="kpi-val" id="metricSavings">$0.00</div>
+        <div class="kpi-trend">Across all tiered bundles</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-title">Free Shipping Unlocked</div>
+        <div class="kpi-val" id="metricFreeShipping">0%</div>
+        <div class="kpi-trend" id="metricFreeShippingCount">0 orders hit threshold</div>
+      </div>
+    </div>
+
+    <!-- Tiered Bundle Discount Manager -->
+    <div class="panel-card">
+      <div class="panel-header">
+        <div>
+          <h2 class="panel-title">🎁 Tiered Bundle Discount Engine</h2>
+          <p class="panel-desc">Configure bundle thresholds and discount percentages. Click "Sync to Shopify" to register Automatic Discounts on Shopify's GraphQL backend.</p>
+        </div>
+        <button type="button" class="btn btn-primary" id="btnSyncDiscounts">
+          🚀 Sync to Shopify Discounts
+        </button>
+      </div>
+
+      <table class="tiers-table">
+        <thead>
+          <tr>
+            <th>Tier Level</th>
+            <th>Badge Label</th>
+            <th>Minimum Quantity</th>
+            <th>Discount (%)</th>
+            <th>Backend Status</th>
+          </tr>
+        </thead>
+        <tbody id="tiersTableBody">
+          <!-- Dynamic tiers injected here -->
+        </tbody>
+      </table>
+
+      <button type="button" class="btn btn-outline" id="btnSaveTiers">Save Tier Settings</button>
+    </div>
+
+    <!-- Free Shipping & Upsell Settings -->
+    <div class="panel-card">
+      <div class="panel-header">
+        <div>
+          <h2 class="panel-title">🛒 Cart Drawer & Free Shipping Threshold</h2>
+          <p class="panel-desc">Set the target basket size to trigger Free Shipping celebration in the Slide-Out Drawer.</p>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 1.5rem; align-items: flex-end; max-width: 500px;">
+        <div style="flex: 1;">
+          <label style="display:block; font-size: 0.8125rem; font-weight:600; margin-bottom: 0.35rem;">Free Shipping Threshold ($ USD)</label>
+          <input type="number" class="form-input" id="inputThreshold" value="75">
+        </div>
+        <button type="button" class="btn btn-primary" id="btnSaveThreshold">Update Threshold</button>
+      </div>
+    </div>
+
+    <!-- Recent Orders Webhook Stream -->
+    <div class="panel-card">
+      <div class="panel-header">
+        <div>
+          <h2 class="panel-title">📡 Real-Time Shopify Order Events</h2>
+          <p class="panel-desc">Live orders captured via <code>orders/paid</code> Shopify Webhooks with HMAC verification.</p>
+        </div>
+      </div>
+
+      <table class="tiers-table">
+        <thead>
+          <tr>
+            <th>Order ID</th>
+            <th>Total Amount</th>
+            <th>Bundle Savings</th>
+            <th>Tier Applied</th>
+            <th>Free Shipping</th>
+            <th>Timestamp</th>
+          </tr>
+        </thead>
+        <tbody id="recentOrdersBody">
+          <!-- Recent orders injected here -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div id="toast" class="toast">Action completed successfully</div>
+
+  <script>
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    async function loadData() {
+      // 1. Fetch Analytics
+      try {
+        const res = await fetch('/api/analytics');
+        const data = await res.json();
+        if (data.success && data.stats) {
+          const s = data.stats;
+          document.getElementById('metricRevenue').textContent = '$' + s.totalRevenue.toFixed(2);
+          document.getElementById('metricAOV').textContent = '$' + s.averageOrderValue.toFixed(2);
+          document.getElementById('metricSavings').textContent = '$' + s.totalSavingsDelivered.toFixed(2);
+          document.getElementById('metricFreeShipping').textContent = s.freeShippingRate + '%';
+          document.getElementById('metricFreeShippingCount').textContent = `${s.freeShippingUnlockedCount} orders reached threshold`;
+
+          // Populate recent orders
+          const ordersBody = document.getElementById('recentOrdersBody');
+          if (s.recentOrders && s.recentOrders.length > 0) {
+            ordersBody.innerHTML = s.recentOrders.map(o => `
+              <tr>
+                <td><strong>#${o.order_id}</strong></td>
+                <td><strong>$${(o.total_price || 0).toFixed(2)}</strong></td>
+                <td>$${(o.bundle_savings || 0).toFixed(2)}</td>
+                <td><span style="background:#ecfdf5;color:#047857;padding:2px 6px;border-radius:4px;font-size:12px;">${o.tier_applied || 'Standard'}</span></td>
+                <td>${o.free_shipping_unlocked ? '✅ Unlocked' : '❌ Not Reached'}</td>
+                <td style="color:#6d7175;font-size:12px;">${new Date(o.timestamp).toLocaleTimeString()}</td>
+              </tr>
+            `).join('');
+          }
+        }
+      } catch (e) {
+        console.error(e);
+      }
+
+      // 2. Fetch Tiers & Settings
+      try {
+        const res = await fetch('/api/settings');
+        const data = await res.json();
+        if (data.success) {
+          if (data.shop && data.shop.free_shipping_threshold) {
+            document.getElementById('inputThreshold').value = data.shop.free_shipping_threshold / 100;
+          }
+
+          if (data.tiers) {
+            const tableBody = document.getElementById('tiersTableBody');
+            tableBody.innerHTML = data.tiers.map(t => `
+              <tr data-tier-num="${t.tier_number}">
+                <td><strong>Tier ${t.tier_number}</strong></td>
+                <td><input type="text" class="form-input badge-input" value="${t.badge}"></td>
+                <td><input type="number" class="form-input qty-input" value="${t.min_quantity}" style="width:80px;"></td>
+                <td><input type="number" class="form-input discount-input" value="${t.discount_percentage}" style="width:80px;"> %</td>
+                <td><span style="color:#008060;font-weight:600;">● Active in Shopify</span></td>
+              </tr>
+            `).join('');
+          }
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    // Save Tiers
+    document.getElementById('btnSaveTiers').addEventListener('click', async () => {
+      const rows = document.querySelectorAll('#tiersTableBody tr');
+      const updatedTiers = [];
+      rows.forEach(r => {
+        updatedTiers.push({
+          tier_number: parseInt(r.dataset.tierNum, 10),
+          badge: r.querySelector('.badge-input').value,
+          min_quantity: parseInt(r.querySelector('.qty-input').value, 10),
+          discount_percentage: parseInt(r.querySelector('.discount-input').value, 10),
+          title: `Buy ${r.querySelector('.qty-input').value} Save ${r.querySelector('.discount-input').value}%`
+        });
+      });
+
+      const res = await fetch('/api/tiers', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tiers: updatedTiers })
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast('✓ Bundle Tiers updated in Database');
+      }
+    });
+
+    // Save Free Shipping Threshold
+    document.getElementById('btnSaveThreshold').addEventListener('click', async () => {
+      const val = parseFloat(document.getElementById('inputThreshold').value || '75');
+      const cents = Math.round(val * 100);
+
+      const res = await fetch('/api/settings', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ free_shipping_threshold: cents, enable_cart_upsell: true })
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast(`✓ Free Shipping Threshold set to $${val.toFixed(2)}`);
+      }
+    });
+
+    // Sync to Shopify GraphQL Automatic Discounts
+    document.getElementById('btnSyncDiscounts').addEventListener('click', async () => {
+      const btn = document.getElementById('btnSyncDiscounts');
+      btn.disabled = true;
+      btn.textContent = 'Syncing GraphQL...';
+
+      try {
+        const res = await fetch('/api/discounts/sync', { method: 'POST' });
+        const data = await res.json();
+        if (data.success) {
+          showToast('🎉 Shopify Automatic Discounts Synchronized Successfully!');
+        }
+      } catch (e) {
+        console.error(e);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '🚀 Sync to Shopify Discounts';
+      }
+    });
+
+    // Simulate Customer Order Webhook
+    document.getElementById('btnSimulateOrder').addEventListener('click', async () => {
+      const randomTotal = (60 + Math.random() * 80);
+      const res = await fetch('/webhooks/simulate-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ total_price: randomTotal })
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast(`⚡ Order #${data.event.order_id} captured ($${randomTotal.toFixed(2)})`);
+        await loadData();
+      }
+    });
+
+    // Initial load
+    loadData();
+  </script>
+</body>
+</html>

@@ -1,0 +1,184 @@
+{% comment %}
+  Conversion Suite - Slide-Out AJAX Cart Drawer
+  Features:
+  - Slide out from right with backdrop blur
+  - Dynamic Free Shipping Progress Bar (US CRO Favorite)
+  - Live line item quantity adjustments via AJAX Cart API
+  - Quick-add cross-sell / upsell recommendation
+  - Trust badges & fast checkout CTA
+{% endcomment %}
+
+{%- assign free_shipping_threshold = settings.free_shipping_threshold | default: 7500 -%}
+
+<div id="CartDrawer" class="cart-drawer-wrapper" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Shopping Cart">
+  <div class="cart-drawer-overlay" data-cart-drawer-close></div>
+
+  <div class="cart-drawer">
+    <!-- Drawer Header -->
+    <div class="cart-drawer__header">
+      <div class="cart-drawer__title-wrap">
+        <h2 class="cart-drawer__title">Your Bag</h2>
+        <span class="cart-drawer__count-badge" data-cart-drawer-count>{{ cart.item_count }}</span>
+      </div>
+      <button type="button" class="cart-drawer__close" data-cart-drawer-close aria-label="Close cart">
+        {% render 'icon-close' %}
+      </button>
+    </div>
+
+    <!-- Free Shipping Progress Bar -->
+    <div class="cart-drawer__shipping-bar" data-shipping-bar data-threshold="{{ free_shipping_threshold }}">
+      {%- assign cart_total = cart.total_price -%}
+      {%- assign threshold_amount = free_shipping_threshold -%}
+      {%- assign diff = threshold_amount | minus: cart_total -%}
+
+      <div class="shipping-bar__message" data-shipping-bar-text>
+        {%- if diff > 0 -%}
+          Add <strong data-shipping-diff>{{ diff | money }}</strong> more to unlock <strong>FREE SHIPPING!</strong> 🚚
+        {%- else -%}
+          🎉 <strong>Congratulations!</strong> You unlocked <strong>FREE SHIPPING!</strong>
+        {%- endif -%}
+      </div>
+
+      <div class="shipping-bar__progress-track">
+        {%- assign percentage = cart_total | times: 100 | divided_by: threshold_amount -%}
+        {%- if percentage > 100 -%}{%- assign percentage = 100 -%}{%- endif -%}
+        <div class="shipping-bar__progress-fill" data-shipping-bar-fill style="width: {{ percentage }}%;">
+          <span class="shipping-bar__truck-icon">🚚</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scrollable Body -->
+    <div class="cart-drawer__body" data-cart-drawer-body>
+      <!-- Loading State Overlay -->
+      <div class="cart-drawer__loading-spinner" data-cart-drawer-loader aria-hidden="true">
+        <div class="spinner"></div>
+      </div>
+
+      <!-- Items List -->
+      <div class="cart-drawer__items-container" data-cart-items-container>
+        {%- if cart.item_count == 0 -%}
+          <div class="cart-drawer__empty">
+            <div class="cart-drawer__empty-icon">
+              {% render 'icon-cart' %}
+            </div>
+            <h3 class="cart-drawer__empty-title">Your cart is empty</h3>
+            <p class="cart-drawer__empty-desc">Discover our bestsellers and unlock special bundle savings today!</p>
+            <a href="/collections/all" class="cart-drawer__continue-btn" data-cart-drawer-close>
+              Explore Products
+            </a>
+          </div>
+        {%- else -%}
+          <div class="cart-drawer__items" data-cart-items>
+            {%- for item in cart.items -%}
+              <div class="cart-drawer__item" data-line-item-key="{{ item.key }}" data-line="{{ forloop.index }}">
+                <div class="cart-item__image-wrap">
+                  {%- if item.image -%}
+                    <img src="{{ item.image | image_url: width: 180 }}" alt="{{ item.title | escape }}" class="cart-item__image" width="90" height="90" loading="lazy">
+                  {%- else -%}
+                    {{ 'product-1' | placeholder_svg_tag: 'cart-item__image-placeholder' }}
+                  {%- endif -%}
+                </div>
+
+                <div class="cart-item__details">
+                  <div class="cart-item__head">
+                    <a href="{{ item.url }}" class="cart-item__title">{{ item.product.title }}</a>
+                    <button type="button" class="cart-item__remove-btn" data-item-remove="{{ item.key }}" aria-label="Remove {{ item.title }}">
+                      {% render 'icon-trash' %}
+                    </button>
+                  </div>
+
+                  {%- unless item.product.has_only_default_variant -%}
+                    <p class="cart-item__variant">{{ item.variant.title }}</p>
+                  {%- endunless -%}
+
+                  {%- comment -%} Bundle tag or custom properties {%- endcomment -%}
+                  {%- if item.properties._bundle_tier or item.properties.Bundle -%}
+                    <div class="cart-item__bundle-badge">
+                      ✨ Bundle Saver ({{ item.properties._bundle_discount | default: 'Special Offer' }})
+                    </div>
+                  {%- endif -%}
+
+                  <div class="cart-item__footer">
+                    <div class="cart-item__quantity-selector">
+                      <button type="button" class="qty-btn qty-btn--minus" data-qty-change="-1" data-key="{{ item.key }}" aria-label="Decrease quantity">
+                        &minus;
+                      </button>
+                      <span class="qty-number" data-qty-val>{{ item.quantity }}</span>
+                      <button type="button" class="qty-btn qty-btn--plus" data-qty-change="1" data-key="{{ item.key }}" aria-label="Increase quantity">
+                        &#43;
+                      </button>
+                    </div>
+
+                    <div class="cart-item__price-box">
+                      {%- if item.original_line_price > item.final_line_price -%}
+                        <s class="cart-item__original-price">{{ item.original_line_price | money }}</s>
+                      {%- endif -%}
+                      <span class="cart-item__final-price">{{ item.final_line_price | money }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            {%- endfor -%}
+          </div>
+        {%- endif -%}
+      </div>
+
+      <!-- Quick Add In-Cart Upsell Booster (CRO Powerhouse) -->
+      {%- if settings.enable_cart_upsell and settings.cart_upsell_product != blank -%}
+        {%- assign upsell_prod = all_products[settings.cart_upsell_product] -%}
+        {%- if upsell_prod and upsell_prod.available -%}
+          <div class="cart-drawer__upsell" data-cart-upsell>
+            <div class="cart-drawer__upsell-badge">🔥 Limited In-Cart Offer</div>
+            <div class="cart-drawer__upsell-content">
+              <img src="{{ upsell_prod.featured_image | image_url: width: 120 }}" alt="{{ upsell_prod.title | escape }}" class="cart-drawer__upsell-img" width="56" height="56" loading="lazy">
+              <div class="cart-drawer__upsell-info">
+                <span class="cart-drawer__upsell-title">{{ upsell_prod.title }}</span>
+                <span class="cart-drawer__upsell-price">{{ upsell_prod.price | money }}</span>
+              </div>
+              <button type="button" class="cart-drawer__upsell-add-btn" data-upsell-add="{{ upsell_prod.selected_or_first_available_variant.id }}">
+                + Add
+              </button>
+            </div>
+          </div>
+        {%- endif -%}
+      {%- endif -%}
+    </div>
+
+    <!-- Drawer Footer -->
+    <div class="cart-drawer__footer {% if cart.item_count == 0 %}is-hidden{% endif %}" data-cart-footer>
+      <!-- Subtotal row -->
+      <div class="cart-drawer__subtotal-row">
+        <span class="cart-drawer__subtotal-label">Subtotal</span>
+        <span class="cart-drawer__subtotal-amount" data-cart-subtotal>{{ cart.total_price | money }}</span>
+      </div>
+
+      <p class="cart-drawer__shipping-notice">
+        Taxes and shipping calculated at checkout.
+      </p>
+
+      <!-- Checkout Button -->
+      <a href="/checkout" class="cart-drawer__checkout-btn" data-cart-checkout>
+        <span class="checkout-icon">🔒</span>
+        <span class="checkout-text">Secure Checkout</span>
+        <span class="checkout-subtotal" data-checkout-subtotal>{{ cart.total_price | money }}</span>
+      </a>
+
+      <!-- US CRO Trust Badges -->
+      <div class="cart-drawer__trust-badges">
+        <div class="trust-badge-item">
+          <span class="trust-badge-icon">🛡️</span>
+          <span>30-Day Guarantee</span>
+        </div>
+        <div class="trust-badge-item">
+          <span class="trust-badge-icon">⚡</span>
+          <span>Fast Dispatch</span>
+        </div>
+        <div class="trust-badge-item">
+          <span class="trust-badge-icon">💳</span>
+          <span>Encrypted Checkout</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

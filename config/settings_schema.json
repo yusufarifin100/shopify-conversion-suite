@@ -1,0 +1,41 @@
+[
+  {
+    "name": "theme_info",
+    "theme_name": "Conversion Suite",
+    "theme_version": "1.0.0",
+    "theme_author": "Antigravity CRO Team",
+    "theme_documentation_url": "https://github.com/example/shopify-conversion-suite",
+    "theme_support_url": "https://github.com/example/shopify-conversion-suite"
+  },
+  {
+    "name": "Conversion Suite - Cart Drawer",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Free Shipping Progress Bar"
+      },
+      {
+        "type": "number",
+        "id": "free_shipping_threshold",
+        "label": "Free Shipping Threshold (in Cents)",
+        "default": 7500,
+        "info": "Example: 7500 = $75.00"
+      },
+      {
+        "type": "header",
+        "content": "In-Cart Upsell Offer"
+      },
+      {
+        "type": "checkbox",
+        "id": "enable_cart_upsell",
+        "label": "Enable In-Cart Quick Add Upsell",
+        "default": true
+      },
+      {
+        "type": "product",
+        "id": "cart_upsell_product",
+        "label": "Featured Upsell Product"
+      }
+    ]
+  }
+]

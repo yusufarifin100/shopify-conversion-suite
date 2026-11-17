@@ -1,0 +1,16 @@
+{
+  "general": {
+    "cart": {
+      "view": "View bag",
+      "checkout": "Checkout",
+      "empty": "Your cart is empty",
+      "subtotal": "Subtotal",
+      "shipping_at_checkout": "Taxes and shipping calculated at checkout"
+    },
+    "bundle": {
+      "add_to_bundle": "+ Add to Bundle",
+      "select_tier": "Select at least {{ count }} items to unlock discount",
+      "bundle_saved": "Bundle Saver Discount"
+    }
+  }
+}

@@ -1,0 +1,104 @@
+{
+  "merchants": [
+    {
+      "shop_domain": "quickstart-demo.myshopify.com",
+      "access_token": "shpat_demo_conversion_suite_token",
+      "free_shipping_threshold": 7500,
+      "enable_cart_upsell": true,
+      "upsell_product_id": "prod_upsell_glow",
+      "currency": "USD",
+      "created_at": "2026-11-17T06:58:35.584Z"
+    }
+  ],
+  "bundle_tiers": [
+    {
+      "id": 1,
+      "shop_domain": "quickstart-demo.myshopify.com",
+      "tier_number": 1,
+      "min_quantity": 2,
+      "discount_percentage": 10,
+      "title": "Starter Bundle",
+      "badge": "Starter Tier",
+      "shopify_discount_code": "BUNDLE10"
+    },
+    {
+      "id": 2,
+      "shop_domain": "quickstart-demo.myshopify.com",
+      "tier_number": 2,
+      "min_quantity": 3,
+      "discount_percentage": 20,
+      "title": "Popular Routine",
+      "badge": "🔥 Most Popular",
+      "shopify_discount_code": "BUNDLE20"
+    },
+    {
+      "id": 3,
+      "shop_domain": "quickstart-demo.myshopify.com",
+      "tier_number": 3,
+      "min_quantity": 4,
+      "discount_percentage": 30,
+      "title": "Maximum Value",
+      "badge": "👑 Best Value",
+      "shopify_discount_code": "BUNDLE30"
+    }
+  ],
+  "analytics_events": [
+    {
+      "id": "evt_1",
+      "shop_domain": "quickstart-demo.myshopify.com",
+      "event_type": "order_completed",
+      "order_id": "1001",
+      "total_price": 114,
+      "bundle_savings": 28.5,
+      "free_shipping_unlocked": true,
+      "tier_applied": "Most Popular (20%)",
+      "timestamp": "2026-11-16T06:58:35.585Z"
+    },
+    {
+      "id": "evt_2",
+      "shop_domain": "quickstart-demo.myshopify.com",
+      "event_type": "order_completed",
+      "order_id": "1002",
+      "total_price": 88,
+      "bundle_savings": 9.77,
+      "free_shipping_unlocked": true,
+      "tier_applied": "Starter Tier (10%)",
+      "timestamp": "2026-11-16T18:58:35.585Z"
+    },
+    {
+      "id": "evt_3",
+      "shop_domain": "quickstart-demo.myshopify.com",
+      "event_type": "order_completed",
+      "order_id": "1003",
+      "total_price": 145,
+      "bundle_savings": 62.14,
+      "free_shipping_unlocked": true,
+      "tier_applied": "Best Value (30%)",
+      "timestamp": "2026-11-17T03:58:35.585Z"
+    },
+    {
+      "id": "evt_1794899491445",
+      "shop_domain": "quickstart-demo.myshopify.com",
+      "event_type": "order_completed",
+      "order_id": "8685",
+      "total_price": 115.79,
+      "bundle_savings": 28.95,
+      "free_shipping_unlocked": true,
+      "tier_applied": "Tier (20%)",
+      "bundle_items_count": 2,
+      "timestamp": "2026-11-17T07:11:31.445Z"
+    },
+    {
+      "id": "evt_1794899589925",
+      "shop_domain": "quickstart-demo.myshopify.com",
+      "event_type": "order_completed",
+      "order_id": "4794",
+      "total_price": 97.83,
+      "bundle_savings": 24.46,
+      "free_shipping_unlocked": true,
+      "tier_applied": "Tier (20%)",
+      "bundle_items_count": 2,
+      "timestamp": "2026-11-17T07:13:09.925Z"
+    }
+  ]
+}

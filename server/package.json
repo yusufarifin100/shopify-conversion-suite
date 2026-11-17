@@ -1,0 +1,25 @@
+{
+  "name": "shopify-conversion-suite-server",
+  "version": "1.0.0",
+  "description": "Backend engine for shopify-conversion-suite: Shopify GraphQL Admin API, Webhooks, Automatic Discounts & Analytics",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "keywords": [
+    "shopify",
+    "shopify-app",
+    "cro",
+    "conversion-rate-optimization",
+    "bundle-discounts",
+    "webhooks"
+  ],
+  "author": "Antigravity CRO Team",
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2"
+  }
+}

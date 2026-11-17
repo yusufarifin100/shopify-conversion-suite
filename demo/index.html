@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Conversion Suite™ &ndash; E-Commerce High-Conversion Marketing Toolkit</title>
+  
+  <!-- CSS Assets -->
+  <link rel="stylesheet" href="../assets/countdown-timer.css">
+  <link rel="stylesheet" href="../assets/bundle-builder.css">
+  <link rel="stylesheet" href="../assets/cart-drawer.css">
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: #f8fafc;
+      color: #0f172a;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Demo Brand Navbar */
+    .demo-navbar {
+      background: #ffffff;
+      border-bottom: 1px solid #e2e8f0;
+      padding: 0.875rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .demo-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+    }
+    .demo-brand-logo {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      font-weight: 800;
+      font-size: 1.125rem;
+    }
+    .demo-brand-name {
+      font-size: 1.125rem;
+      font-weight: 800;
+      color: #0f172a;
+      letter-spacing: -0.02em;
+    }
+    .demo-brand-tag {
+      background: #ecfdf5;
+      color: #047857;
+      font-size: 0.6875rem;
+      font-weight: 700;
+      padding: 0.2rem 0.5rem;
+      border-radius: 9999px;
+      border: 1px solid #a7f3d0;
+    }
+    .demo-cart-trigger {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.625rem;
+      background: #0f172a;
+      color: #ffffff;
+      border: none;
+      padding: 0.625rem 1.125rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 0.875rem;
+      transition: all 0.2s;
+    }
+    .demo-cart-trigger:hover {
+      background: #1e293b;
+      transform: translateY(-1px);
+    }
+    .demo-cart-badge {
+      background: #10b981;
+      color: #ffffff;
+      font-size: 0.75rem;
+      font-weight: 800;
+      padding: 0.1rem 0.45rem;
+      border-radius: 9999px;
+    }
+
+    /* CRO Showcase Intro */
+    .demo-intro {
+      background: #ffffff;
+      border-bottom: 1px solid #e2e8f0;
+      padding: 1.5rem 2rem;
+      text-align: center;
+    }
+    .demo-intro-badge {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: #ea580c;
+      background: #fff7ed;
+      border: 1px solid #ffedd5;
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      margin-bottom: 0.5rem;
+    }
+    .demo-intro h1 {
+      margin: 0 0 0.5rem;
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: #0f172a;
+    }
+    .demo-intro p {
+      margin: 0 auto;
+      max-width: 700px;
+      font-size: 0.9375rem;
+      color: #475569;
+    }
+
+    /* Product Card Image styles in demo */
+    .demo-img-wrapper {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+      font-size: 3.5rem;
+    }
+  </style>
+
+  <!-- Mock Shopify AJAX Cart API for pure standalone preview without a live server -->
+  <script>
+    (function() {
+      // In-memory simulated cart state
+      let mockCart = {
+        item_count: 1,
+        total_price: 3800,
+        currency: 'USD',
+        items: [
+          {
+            key: 'item_1_mock',
+            id: 101,
+            title: 'Ultra Hydration Serum (50ml)',
+            product_title: 'Ultra Hydration Serum',
+            variant_title: '50ml Standard',
+            quantity: 1,
+            original_line_price: 3800,
+            final_line_price: 3800,
+            image: 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=200&auto=format&fit=crop&q=80',
+            properties: {
+              '_bundle_tier': 'Starter Bundle',
+              '_bundle_discount': '10%'
+            }
+          }
+        ]
+      };
+
+      const originalFetch = window.fetch;
+      window.fetch = async function(url, options = {}) {
+        // Intercept /cart.js
+        if (typeof url === 'string' && url.includes('/cart.js')) {
+          return new Response(JSON.stringify(mockCart), {
+            status: 200,
+            headers: { 'Content-Type': 'application/json' }
+          });
+        }
+
+        // Intercept /cart/add.js
+        if (typeof url === 'string' && url.includes('/cart/add.js')) {
+          let payload;
+          if (options.body instanceof FormData) {
+            payload = {
+              id: options.body.get('id'),
+              quantity: parseInt(options.body.get('quantity') || '1', 10)
+            };
+          } else if (typeof options.body === 'string') {
+            payload = JSON.parse(options.body);
+          }
+
+          if (payload.items && Array.isArray(payload.items)) {
+            payload.items.forEach((item, idx) => {
+              const existing = mockCart.items.find(i => i.id == item.id);
+              if (existing) {
+                existing.quantity += item.quantity;
+                existing.final_line_price = existing.quantity * (existing.final_line_price / (existing.quantity - item.quantity));
+              } else {
+                mockCart.items.push({
+                  key: 'mock_' + Date.now() + '_' + idx,
+                  id: item.id,
+                  title: 'Selected Bundle Item #' + item.id,
+                  product_title: 'Custom Curated Product',
+                  variant_title: 'Selected Option',
+                  quantity: item.quantity,
+                  original_line_price: 3200 * item.quantity,
+                  final_line_price: 3200 * item.quantity,
+                  image: 'https://images.unsplash.com/photo-1571781926291-c477ebfd024b?w=200&auto=format&fit=crop&q=80',
+                  properties: item.properties || {}
+                });
+              }
+            });
+          } else if (payload.id) {
+            mockCart.items.push({
+              key: 'mock_' + Date.now(),
+              id: payload.id,
+              title: 'Express Glow Booster',
+              product_title: 'Express Glow Booster',
+              variant_title: 'Single Pack',
+              quantity: payload.quantity || 1,
+              original_line_price: 1900,
+              final_line_price: 1900,
+              image: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=200&auto=format&fit=crop&q=80',
+              properties: payload.properties || {}
+            });
+          }
+
+          // Recalculate cart totals
+          mockCart.item_count = mockCart.items.reduce((acc, curr) => acc + curr.quantity, 0);
+          mockCart.total_price = mockCart.items.reduce((acc, curr) => acc + curr.final_line_price, 0);
+
+          return new Response(JSON.stringify(mockCart), {
+            status: 200,
+            headers: { 'Content-Type': 'application/json' }
+          });
+        }
+
+        // Intercept /cart/change.js
+        if (typeof url === 'string' && url.includes('/cart/change.js')) {
+          let payload = JSON.parse(options.body || '{}');
+          const targetKey = payload.id;
+          const newQty = payload.quantity;
+
+          if (newQty <= 0) {
+            mockCart.items = mockCart.items.filter(i => i.key !== targetKey);
+          } else {
+            const item = mockCart.items.find(i => i.key === targetKey);
+            if (item) {
+              const unitPrice = item.final_line_price / item.quantity;
+              item.quantity = newQty;
+              item.final_line_price = unitPrice * newQty;
+              item.original_line_price = unitPrice * newQty;
+            }
+          }
+
+          mockCart.item_count = mockCart.items.reduce((acc, curr) => acc + curr.quantity, 0);
+          mockCart.total_price = mockCart.items.reduce((acc, curr) => acc + curr.final_line_price, 0);
+
+          return new Response(JSON.stringify(mockCart), {
+            status: 200,
+            headers: { 'Content-Type': 'application/json' }
+          });
+        }
+
+        return originalFetch(url, options);
+      };
+    })();
+  </script>
+</head>
+<body>
+
+  <!-- Demo Top Navbar -->
+  <header class="demo-navbar">
+    <a href="#" class="demo-brand">
+      <div class="demo-brand-logo">⚡</div>
+      <span class="demo-brand-name">ConversionSuite™</span>
+      <span class="demo-brand-tag">OS 2.0 CRO Toolkit</span>
+    </a>
+    <button type="button" class="demo-cart-trigger" data-cart-drawer-trigger aria-label="Open Slide-Out Cart">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="9" cy="21" r="1"></circle>
+        <circle cx="20" cy="21" r="1"></circle>
+        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+      </svg>
+      <span>Cart Drawer</span>
+      <span class="demo-cart-badge" data-cart-drawer-count>1</span>
+    </button>
+  </header>
+
+  <!-- Showcase Sub-Banner -->
+  <div class="demo-intro">
+    <span class="demo-intro-badge">🇺🇸 HIGH CONVERSION CRO SHOWCASE</span>
+    <h1>E-Commerce Revenue Optimization Toolkit</h1>
+    <p>Test the 3 core features below: Flash Sale Countdown Timer with dynamic urgency, "Buy More, Save More" Bundle Builder with auto-calculating tier discounts, and the Slide-Out AJAX Cart with a Free Shipping Progress Bar.</p>
+  </div>
+
+  <!-- FEATURE 3: Flash Sale Countdown Urgency Banner -->
+  <section class="countdown-banner countdown-banner--hero"
+           id="CountdownBanner-demo"
+           data-countdown-mode="evergreen"
+           data-evergreen-hours="12">
+    <div class="countdown-banner__container">
+      <div class="countdown-banner__content">
+        <!-- Live Badge -->
+        <div class="countdown-banner__badge-wrap">
+          <span class="countdown-banner__live-pill">
+            <span class="pulse-dot"></span>
+            ⚡ FLASH SALE ENDING SOON &bull; LIMITED INVENTORY
+          </span>
+        </div>
+
+        <!-- Heading -->
+        <div class="countdown-banner__text-wrap">
+          <h2 class="countdown-banner__heading">VIP Black Friday Early Access</h2>
+          <p class="countdown-banner__subheading">Unlock an extra 30% discount when you build a bundle today. Free express US shipping automatically unlocked at $75+.</p>
+        </div>
+
+        <!-- Timer Ticker -->
+        <div class="countdown-banner__timer" data-countdown-timer>
+          <div class="timer-unit">
+            <div class="timer-box">
+              <span class="timer-num" data-timer-days>00</span>
+            </div>
+            <span class="timer-label">Days</span>
+          </div>
+          <span class="timer-separator">:</span>
+
+          <div class="timer-unit">
+            <div class="timer-box">
+              <span class="timer-num" data-timer-hours>11</span>
+            </div>
+            <span class="timer-label">Hours</span>
+          </div>
+          <span class="timer-separator">:</span>
+
+          <div class="timer-unit">
+            <div class="timer-box">
+              <span class="timer-num" data-timer-mins>48</span>
+            </div>
+            <span class="timer-label">Mins</span>
+          </div>
+          <span class="timer-separator">:</span>
+
+          <div class="timer-unit">
+            <div class="timer-box">
+              <span class="timer-num" data-timer-secs>24</span>
+            </div>
+            <span class="timer-label">Secs</span>
+          </div>
+        </div>
+
+        <!-- Coupon Copy & CTA -->
+        <div class="countdown-banner__actions">
+          <button type="button" class="countdown-banner__coupon-pill" data-copy-coupon="SAVE30" aria-label="Copy coupon code">
+            <span class="coupon-label">Coupon:</span>
+            <strong class="coupon-code">SAVE30</strong>
+            <span class="coupon-action" data-coupon-feedback>Tap to Copy</span>
+          </button>
+          <a href="#BundleBuilder" class="countdown-banner__cta-btn">
+            Build Your Bundle Below
+            <span class="cta-arrow">↓</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURE 1: Dynamic "Buy More, Save More" Bundle Builder -->
+  <section class="bundle-builder" 
+           id="BundleBuilder"
+           data-tier-1-qty="2"
+           data-tier-1-discount="10"
+           data-tier-2-qty="3"
+           data-tier-2-discount="20"
+           data-tier-3-qty="4"
+           data-tier-3-discount="30"
+           data-currency-symbol="$"
+           style="padding-top: 60px; padding-bottom: 80px;">
+    
+    <div class="bundle-builder__container">
+      <!-- Header -->
+      <div class="bundle-builder__header">
+        <span class="bundle-builder__eyebrow">🎁 TIERED SAVINGS ENGINE</span>
+        <h2 class="bundle-builder__title">Buy More, Save More Bundle</h2>
+        <p class="bundle-builder__subheading">Select your favorite products to assemble a custom high-performance routine. Tiers automatically unlock bigger discounts and trigger Free Shipping in your cart drawer!</p>
+
+        <!-- Tier Selector Cards -->
+        <div class="bundle-builder__tiers">
+          <div class="bundle-tier-card" data-tier="1" data-qty="2" data-discount="10">
+            <div class="tier-card__badge">Starter Tier</div>
+            <div class="tier-card__title">Buy 2 Items</div>
+            <div class="tier-card__discount">Save 10% OFF</div>
+          </div>
+
+          <div class="bundle-tier-card is-popular" data-tier="2" data-qty="3" data-discount="20">
+            <div class="tier-card__badge">🔥 Most Popular</div>
+            <div class="tier-card__title">Buy 3 Items</div>
+            <div class="tier-card__discount">Save 20% OFF</div>
+          </div>
+
+          <div class="bundle-tier-card is-best-value" data-tier="3" data-qty="4" data-discount="30">
+            <div class="tier-card__badge">👑 Best Value</div>
+            <div class="tier-card__title">Buy 4+ Items</div>
+            <div class="tier-card__discount">Save 30% OFF</div>
+          </div>
+        </div>
+
+        <!-- Dynamic Feedback Banner -->
+        <div class="bundle-builder__progress-banner" data-bundle-progress-banner>
+          <span class="progress-banner__icon">💡</span>
+          <span class="progress-banner__text" data-bundle-status-text>
+            Select at least <strong>2 items</strong> to unlock <strong>10% OFF</strong>!
+          </span>
+        </div>
+      </div>
+
+      <!-- Products Grid -->
+      <div class="bundle-builder__grid">
+        <!-- Product 1 -->
+        <div class="bundle-product-card" data-product-id="prod_1">
+          <span class="bundle-product-card__badge">BESTSELLER</span>
+          <div class="bundle-product-card__media">
+            <img src="https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=600&auto=format&fit=crop&q=80" alt="Ultra Hydration Serum" class="bundle-product-card__img" loading="lazy">
+          </div>
+          <div class="bundle-product-card__info">
+            <div class="bundle-product-card__rating">
+              <span class="stars">★★★★★</span>
+              <span class="rating-val">4.9</span>
+              <span class="reviews-count">(1,420+ reviews)</span>
+            </div>
+            <h3 class="bundle-product-card__title">Hydra-Barrier Repair Serum</h3>
+            <div class="bundle-product-card__price-row">
+              <span class="bundle-product-card__price" data-base-price="3800">$38.00</span>
+              <s class="bundle-product-card__compare-price">$48.00</s>
+            </div>
+            <div class="bundle-product-card__variants">
+              <label class="variant-label">Formula Variant:</label>
+              <select class="bundle-product-card__variant-select" data-variant-select>
+                <option value="101" data-price="3800" selected>Original Formula (50ml) - $38.00</option>
+                <option value="102" data-price="5800">Double Size Jumbo (100ml) - $58.00</option>
+              </select>
+            </div>
+            <div class="bundle-product-card__action">
+              <button type="button" class="bundle-product-card__btn-add" data-bundle-quick-add>+ Add to Bundle</button>
+              <div class="bundle-product-card__qty-control is-hidden" data-bundle-qty-control>
+                <button type="button" class="bb-qty-btn bb-qty-minus" data-qty-minus>&minus;</button>
+                <span class="bb-qty-count" data-qty-count>1</span>
+                <button type="button" class="bb-qty-btn bb-qty-plus" data-qty-plus>&#43;</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Product 2 -->
+        <div class="bundle-product-card" data-product-id="prod_2">
+          <span class="bundle-product-card__badge">CLINICAL STRENGTH</span>
+          <div class="bundle-product-card__media">
+            <img src="https://images.unsplash.com/photo-1556228720-195a672e8a03?w=600&auto=format&fit=crop&q=80" alt="Vitamin C Brightening Fluid" class="bundle-product-card__img" loading="lazy">
+          </div>
+          <div class="bundle-product-card__info">
+            <div class="bundle-product-card__rating">
+              <span class="stars">★★★★★</span>
+              <span class="rating-val">4.8</span>
+              <span class="reviews-count">(890+ reviews)</span>
+            </div>
+            <h3 class="bundle-product-card__title">15% Vitamin C Glow Elixir</h3>
+            <div class="bundle-product-card__price-row">
+              <span class="bundle-product-card__price" data-base-price="4200">$42.00</span>
+              <s class="bundle-product-card__compare-price">$52.00</s>
+            </div>
+            <div class="bundle-product-card__variants">
+              <label class="variant-label">Skin Type:</label>
+              <select class="bundle-product-card__variant-select" data-variant-select>
+                <option value="201" data-price="4200" selected>All Skin Types (30ml) - $42.00</option>
+                <option value="202" data-price="4400">Sensitive Formulation (30ml) - $44.00</option>
+              </select>
+            </div>
+            <div class="bundle-product-card__action">
+              <button type="button" class="bundle-product-card__btn-add" data-bundle-quick-add>+ Add to Bundle</button>
+              <div class="bundle-product-card__qty-control is-hidden" data-bundle-qty-control>
+                <button type="button" class="bb-qty-btn bb-qty-minus" data-qty-minus>&minus;</button>
+                <span class="bb-qty-count" data-qty-count>1</span>
+                <button type="button" class="bb-qty-btn bb-qty-plus" data-qty-plus>&#43;</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Product 3 -->
+        <div class="bundle-product-card" data-product-id="prod_3">
+          <span class="bundle-product-card__badge">DERM RECOMMENDED</span>
+          <div class="bundle-product-card__media">
+            <img src="https://images.unsplash.com/photo-1571781926291-c477ebfd024b?w=600&auto=format&fit=crop&q=80" alt="Ceramide Peptide Cream" class="bundle-product-card__img" loading="lazy">
+          </div>
+          <div class="bundle-product-card__info">
+            <div class="bundle-product-card__rating">
+              <span class="stars">★★★★★</span>
+              <span class="rating-val">5.0</span>
+              <span class="reviews-count">(2,110+ reviews)</span>
+            </div>
+            <h3 class="bundle-product-card__title">Overnight Ceramide Recovery Cream</h3>
+            <div class="bundle-product-card__price-row">
+              <span class="bundle-product-card__price" data-base-price="3600">$36.00</span>
+              <s class="bundle-product-card__compare-price">$45.00</s>
+            </div>
+            <div class="bundle-product-card__variants">
+              <label class="variant-label">Texture:</label>
+              <select class="bundle-product-card__variant-select" data-variant-select>
+                <option value="301" data-price="3600" selected>Rich Whipped Cream (60ml) - $36.00</option>
+                <option value="302" data-price="3600">Lightweight Gel Cream (60ml) - $36.00</option>
+              </select>
+            </div>
+            <div class="bundle-product-card__action">
+              <button type="button" class="bundle-product-card__btn-add" data-bundle-quick-add>+ Add to Bundle</button>
+              <div class="bundle-product-card__qty-control is-hidden" data-bundle-qty-control>
+                <button type="button" class="bb-qty-btn bb-qty-minus" data-qty-minus>&minus;</button>
+                <span class="bb-qty-count" data-qty-count>1</span>
+                <button type="button" class="bb-qty-btn bb-qty-plus" data-qty-plus>&#43;</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Product 4 -->
+        <div class="bundle-product-card" data-product-id="prod_4">
+          <span class="bundle-product-card__badge">COMMUNITY FAVORITE</span>
+          <div class="bundle-product-card__media">
+            <img src="https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?w=600&auto=format&fit=crop&q=80" alt="Gentle Exfoliating Cleanser" class="bundle-product-card__img" loading="lazy">
+          </div>
+          <div class="bundle-product-card__info">
+            <div class="bundle-product-card__rating">
+              <span class="stars">★★★★★</span>
+              <span class="rating-val">4.9</span>
+              <span class="reviews-count">(640+ reviews)</span>
+            </div>
+            <h3 class="bundle-product-card__title">Amino-Acid Balancing Cleanser</h3>
+            <div class="bundle-product-card__price-row">
+              <span class="bundle-product-card__price" data-base-price="2800">$28.00</span>
+              <s class="bundle-product-card__compare-price">$34.00</s>
+            </div>
+            <div class="bundle-product-card__variants">
+              <input type="hidden" data-variant-select value="401" data-price="2800">
+            </div>
+            <div class="bundle-product-card__action">
+              <button type="button" class="bundle-product-card__btn-add" data-bundle-quick-add>+ Add to Bundle</button>
+              <div class="bundle-product-card__qty-control is-hidden" data-bundle-qty-control>
+                <button type="button" class="bb-qty-btn bb-qty-minus" data-qty-minus>&minus;</button>
+                <span class="bb-qty-count" data-qty-count>1</span>
+                <button type="button" class="bb-qty-btn bb-qty-plus" data-qty-plus>&#43;</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sticky Live Bundle Summary & Add to Cart -->
+      <div class="bundle-builder__summary-bar" data-bundle-summary-bar>
+        <div class="summary-bar__inner">
+          <div class="summary-bar__meta">
+            <div class="summary-bar__count">
+              <span class="count-pill" data-summary-count>0</span> Items In Bundle
+            </div>
+            <div class="summary-bar__tier-status" data-summary-tier-status>
+              Select 2 items to get 10% OFF
+            </div>
+          </div>
+
+          <div class="summary-bar__pricing">
+            <div class="summary-bar__savings-badge is-hidden" data-summary-savings-badge>
+              Save <span data-summary-savings-amount>$0.00</span> (<span data-summary-savings-percent>0%</span>)
+            </div>
+            <div class="summary-bar__totals">
+              <s class="summary-bar__original-price is-hidden" data-summary-original-price>$0.00</s>
+              <span class="summary-bar__final-price" data-summary-final-price>$0.00</span>
+            </div>
+          </div>
+
+          <div class="summary-bar__cta-wrap">
+            <button type="button" class="bundle-builder__add-cart-btn" data-bundle-add-to-cart disabled>
+              <span class="btn-text">Add Bundle to Cart</span>
+              <span class="btn-price" data-btn-bundle-price>$0.00</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURE 2: Slide-Out AJAX Cart Drawer Snippet -->
+  <div id="CartDrawer" class="cart-drawer-wrapper" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Shopping Cart">
+    <div class="cart-drawer-overlay" data-cart-drawer-close></div>
+
+    <div class="cart-drawer">
+      <!-- Drawer Header -->
+      <div class="cart-drawer__header">
+        <div class="cart-drawer__title-wrap">
+          <h2 class="cart-drawer__title">Your Bag</h2>
+          <span class="cart-drawer__count-badge" data-cart-drawer-count>1</span>
+        </div>
+        <button type="button" class="cart-drawer__close" data-cart-drawer-close aria-label="Close cart">
+          <svg class="icon icon-close" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Free Shipping Progress Bar (CRO Favorite) -->
+      <div class="cart-drawer__shipping-bar" data-shipping-bar data-threshold="7500">
+        <div class="shipping-bar__message" data-shipping-bar-text>
+          Add <strong data-shipping-diff>$37.00</strong> more to unlock <strong>FREE SHIPPING!</strong> 🚚
+        </div>
+        <div class="shipping-bar__progress-track">
+          <div class="shipping-bar__progress-fill" data-shipping-bar-fill style="width: 50.6%;">
+            <span class="shipping-bar__truck-icon">🚚</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Scrollable Body -->
+      <div class="cart-drawer__body" data-cart-drawer-body>
+        <!-- Loader -->
+        <div class="cart-drawer__loading-spinner" data-cart-drawer-loader aria-hidden="true">
+          <div class="spinner"></div>
+        </div>
+
+        <!-- Items Container -->
+        <div class="cart-drawer__items-container" data-cart-items-container>
+          <div class="cart-drawer__items" data-cart-items>
+            <div class="cart-drawer__item" data-line-item-key="item_1_mock">
+              <div class="cart-item__image-wrap">
+                <img src="https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=200&auto=format&fit=crop&q=80" alt="Hydra-Barrier Serum" class="cart-item__image">
+              </div>
+              <div class="cart-item__details">
+                <div class="cart-item__head">
+                  <span class="cart-item__title">Hydra-Barrier Repair Serum</span>
+                  <button type="button" class="cart-item__remove-btn" data-item-remove="item_1_mock">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <polyline points="3 6 5 6 21 6"></polyline>
+                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    </svg>
+                  </button>
+                </div>
+                <p class="cart-item__variant">50ml Standard</p>
+                <div class="cart-item__bundle-badge">✨ Bundle Saver (10%)</div>
+                <div class="cart-item__footer">
+                  <div class="cart-item__quantity-selector">
+                    <button type="button" class="qty-btn" data-qty-change="-1" data-key="item_1_mock">&minus;</button>
+                    <span class="qty-number" data-qty-val>1</span>
+                    <button type="button" class="qty-btn" data-qty-change="1" data-key="item_1_mock">&#43;</button>
+                  </div>
+                  <div class="cart-item__price-box">
+                    <span class="cart-item__final-price">$38.00</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Add In-Cart Upsell Booster -->
+        <div class="cart-drawer__upsell" data-cart-upsell>
+          <div class="cart-drawer__upsell-badge">🔥 Limited In-Cart Offer</div>
+          <div class="cart-drawer__upsell-content">
+            <img src="https://images.unsplash.com/photo-1556228720-195a672e8a03?w=120&auto=format&fit=crop&q=80" alt="Glow Booster" class="cart-drawer__upsell-img">
+            <div class="cart-drawer__upsell-info">
+              <span class="cart-drawer__upsell-title">Express Glow Booster Mini</span>
+              <span class="cart-drawer__upsell-price">$19.00</span>
+            </div>
+            <button type="button" class="cart-drawer__upsell-add-btn" data-upsell-add="upsell_999">
+              + Add
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Drawer Footer -->
+      <div class="cart-drawer__footer" data-cart-footer>
+        <div class="cart-drawer__subtotal-row">
+          <span class="cart-drawer__subtotal-label">Subtotal</span>
+          <span class="cart-drawer__subtotal-amount" data-cart-subtotal>$38.00</span>
+        </div>
+        <p class="cart-drawer__shipping-notice">Taxes and shipping calculated at checkout.</p>
+        
+        <a href="#checkout" class="cart-drawer__checkout-btn" data-cart-checkout>
+          <span class="checkout-icon">🔒</span>
+          <span class="checkout-text">Secure Checkout</span>
+          <span class="checkout-subtotal" data-checkout-subtotal>$38.00</span>
+        </a>
+
+        <div class="cart-drawer__trust-badges">
+          <div class="trust-badge-item">
+            <span class="trust-badge-icon">🛡️</span>
+            <span>30-Day Guarantee</span>
+          </div>
+          <div class="trust-badge-item">
+            <span class="trust-badge-icon">⚡</span>
+            <span>Fast Dispatch</span>
+          </div>
+          <div class="trust-badge-item">
+            <span class="trust-badge-icon">💳</span>
+            <span>Encrypted Checkout</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="../assets/cart-drawer.js"></script>
+  <script src="../assets/countdown-timer.js"></script>
+  <script src="../assets/bundle-builder.js"></script>
+
+</body>
+</html>

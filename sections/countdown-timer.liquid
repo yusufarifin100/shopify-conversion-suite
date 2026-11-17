@@ -1,0 +1,237 @@
+{% comment %}
+  Conversion Suite - Flash Sale Countdown Urgency Banner
+  Drives conversion urgency with animated ticker countdown, coupon copy pill, and CTA button.
+{% endcomment %}
+
+{{ 'countdown-timer.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'countdown-timer.js' | asset_url }}" defer="defer"></script>
+
+{%- style -%}
+  .countdown-banner--{{ section.id }} {
+    --cb-bg-start: {{ section.settings.bg_gradient_start }};
+    --cb-bg-end: {{ section.settings.bg_gradient_end }};
+    --cb-text-color: {{ section.settings.text_color }};
+    --cb-accent-color: {{ section.settings.accent_color }};
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+  }
+{%- endstyle -%}
+
+<section class="countdown-banner countdown-banner--{{ section.id }} countdown-banner--{{ section.settings.display_style }}"
+         id="CountdownBanner-{{ section.id }}"
+         data-countdown-mode="{{ section.settings.timer_mode }}"
+         data-target-date="{{ section.settings.target_end_date }}"
+         data-evergreen-hours="{{ section.settings.evergreen_hours }}">
+  
+  <div class="countdown-banner__container">
+    <div class="countdown-banner__content">
+      <!-- Urgency Badge -->
+      <div class="countdown-banner__badge-wrap">
+        <span class="countdown-banner__live-pill">
+          <span class="pulse-dot"></span>
+          {{ section.settings.badge_text }}
+        </span>
+      </div>
+
+      <!-- Main Heading & Subheading -->
+      <div class="countdown-banner__text-wrap">
+        <h2 class="countdown-banner__heading">{{ section.settings.heading }}</h2>
+        {%- if section.settings.subheading != blank -%}
+          <p class="countdown-banner__subheading">{{ section.settings.subheading }}</p>
+        {%- endif -%}
+      </div>
+
+      <!-- Countdown Flip Ticker -->
+      <div class="countdown-banner__timer" data-countdown-timer>
+        <div class="timer-unit">
+          <div class="timer-box">
+            <span class="timer-num" data-timer-days>00</span>
+          </div>
+          <span class="timer-label">Days</span>
+        </div>
+        <span class="timer-separator">:</span>
+
+        <div class="timer-unit">
+          <div class="timer-box">
+            <span class="timer-num" data-timer-hours>00</span>
+          </div>
+          <span class="timer-label">Hours</span>
+        </div>
+        <span class="timer-separator">:</span>
+
+        <div class="timer-unit">
+          <div class="timer-box">
+            <span class="timer-num" data-timer-mins>00</span>
+          </div>
+          <span class="timer-label">Mins</span>
+        </div>
+        <span class="timer-separator">:</span>
+
+        <div class="timer-unit">
+          <div class="timer-box">
+            <span class="timer-num" data-timer-secs>00</span>
+          </div>
+          <span class="timer-label">Secs</span>
+        </div>
+      </div>
+
+      <!-- Actions & Coupon Code -->
+      <div class="countdown-banner__actions">
+        {%- if section.settings.discount_code != blank -%}
+          <button type="button" class="countdown-banner__coupon-pill" data-copy-coupon="{{ section.settings.discount_code }}" aria-label="Copy code {{ section.settings.discount_code }}">
+            <span class="coupon-label">Code:</span>
+            <strong class="coupon-code">{{ section.settings.discount_code }}</strong>
+            <span class="coupon-action" data-coupon-feedback>Tap to Copy</span>
+          </button>
+        {%- endif -%}
+
+        {%- if section.settings.button_text != blank -%}
+          <a href="{{ section.settings.button_link | default: '/collections/all' }}" class="countdown-banner__cta-btn">
+            {{ section.settings.button_text }}
+            <span class="cta-arrow">→</span>
+          </a>
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Flash Sale Countdown",
+  "tag": "section",
+  "class": "section-countdown-banner",
+  "settings": [
+    {
+      "type": "select",
+      "id": "display_style",
+      "label": "Banner Layout Style",
+      "options": [
+        { "value": "hero", "label": "Full Hero Banner" },
+        { "value": "compact", "label": "Compact Bar" }
+      ],
+      "default": "hero"
+    },
+    {
+      "type": "text",
+      "id": "badge_text",
+      "label": "Urgency Badge Text",
+      "default": "⚡ FLASH SALE ENDING SOON"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Limited-Time VIP Savings Event"
+    },
+    {
+      "type": "textarea",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Unlock up to 30% off when you build your custom bundle today. Stock is extremely limited."
+    },
+    {
+      "type": "header",
+      "content": "Timer Configuration"
+    },
+    {
+      "type": "select",
+      "id": "timer_mode",
+      "label": "Timer Mode",
+      "options": [
+        { "value": "evergreen", "label": "Evergreen Rolling Timer (Resets daily for maximum urgency)" },
+        { "value": "fixed", "label": "Fixed End Date" }
+      ],
+      "default": "evergreen"
+    },
+    {
+      "type": "number",
+      "id": "evergreen_hours",
+      "label": "Evergreen Duration (Hours)",
+      "default": 12,
+      "info": "Countdown resets every X hours for each visitor"
+    },
+    {
+      "type": "text",
+      "id": "target_end_date",
+      "label": "Fixed End Date (ISO 8601)",
+      "default": "2026-12-31T23:59:59",
+      "info": "Format: YYYY-MM-DDTHH:MM:SS (Used only if timer mode is Fixed)"
+    },
+    {
+      "type": "header",
+      "content": "Coupon & Call-to-Action"
+    },
+    {
+      "type": "text",
+      "id": "discount_code",
+      "label": "Coupon Code to Copy",
+      "default": "BUNDLE30"
+    },
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Button Label",
+      "default": "Claim Offer Now"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Button Destination URL"
+    },
+    {
+      "type": "header",
+      "content": "Styling & Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_gradient_start",
+      "label": "Background Gradient Start",
+      "default": "#0f172a"
+    },
+    {
+      "type": "color",
+      "id": "bg_gradient_end",
+      "label": "Background Gradient End",
+      "default": "#1e293b"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color",
+      "default": "#10b981"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 20,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Top Padding",
+      "default": 52
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 20,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Bottom Padding",
+      "default": 52
+    }
+  ],
+  "presets": [
+    {
+      "name": "Flash Sale Countdown Banner"
+    }
+  ]
+}
+{% endschema %}

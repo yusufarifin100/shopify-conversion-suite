@@ -1,0 +1,337 @@
+{% comment %}
+  Conversion Suite - Dynamic "Buy More, Save More" Bundle Builder
+  Allows customers to build customized bundles and unlock tiered discounts automatically.
+{% endcomment %}
+
+{{ 'bundle-builder.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'bundle-builder.js' | asset_url }}" defer="defer"></script>
+
+{%- style -%}
+  .bundle-builder--{{ section.id }} {
+    --bb-accent-color: {{ section.settings.accent_color }};
+    --bb-bg-color: {{ section.settings.bg_color }};
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+  }
+{%- endstyle -%}
+
+<section class="bundle-builder bundle-builder--{{ section.id }}" 
+         id="BundleBuilder-{{ section.id }}"
+         data-tier-1-qty="{{ section.settings.tier_1_qty }}"
+         data-tier-1-discount="{{ section.settings.tier_1_discount }}"
+         data-tier-2-qty="{{ section.settings.tier_2_qty }}"
+         data-tier-2-discount="{{ section.settings.tier_2_discount }}"
+         data-tier-3-qty="{{ section.settings.tier_3_qty }}"
+         data-tier-3-discount="{{ section.settings.tier_3_discount }}"
+         data-currency-symbol="{{ cart.currency.symbol | default: '$' }}">
+  
+  <div class="bundle-builder__container">
+    <!-- Header with CRO Eyebrow & Badges -->
+    <div class="bundle-builder__header">
+      {%- if section.settings.eyebrow != blank -%}
+        <span class="bundle-builder__eyebrow">{{ section.settings.eyebrow }}</span>
+      {%- endif -%}
+      <h2 class="bundle-builder__title">{{ section.settings.heading }}</h2>
+      {%- if section.settings.subheading != blank -%}
+        <p class="bundle-builder__subheading">{{ section.settings.subheading }}</p>
+      {%- endif -%}
+
+      <!-- Dynamic Tier Selector Tabs -->
+      <div class="bundle-builder__tiers">
+        <div class="bundle-tier-card" data-tier="1" data-qty="{{ section.settings.tier_1_qty }}" data-discount="{{ section.settings.tier_1_discount }}">
+          <div class="tier-card__badge">Starter Bundle</div>
+          <div class="tier-card__title">Buy {{ section.settings.tier_1_qty }} Items</div>
+          <div class="tier-card__discount">Save {{ section.settings.tier_1_discount }}%</div>
+        </div>
+
+        <div class="bundle-tier-card is-popular" data-tier="2" data-qty="{{ section.settings.tier_2_qty }}" data-discount="{{ section.settings.tier_2_discount }}">
+          <div class="tier-card__badge">🔥 Most Popular</div>
+          <div class="tier-card__title">Buy {{ section.settings.tier_2_qty }} Items</div>
+          <div class="tier-card__discount">Save {{ section.settings.tier_2_discount }}%</div>
+        </div>
+
+        <div class="bundle-tier-card is-best-value" data-tier="3" data-qty="{{ section.settings.tier_3_qty }}" data-discount="{{ section.settings.tier_3_discount }}">
+          <div class="tier-card__badge">👑 Best Value</div>
+          <div class="tier-card__title">Buy {{ section.settings.tier_3_qty }}+ Items</div>
+          <div class="tier-card__discount">Save {{ section.settings.tier_3_discount }}%</div>
+        </div>
+      </div>
+
+      <!-- Live Dynamic Tier Feedback Banner -->
+      <div class="bundle-builder__progress-banner" data-bundle-progress-banner>
+        <span class="progress-banner__icon">💡</span>
+        <span class="progress-banner__text" data-bundle-status-text>
+          Select at least <strong>{{ section.settings.tier_1_qty }} items</strong> to unlock <strong>{{ section.settings.tier_1_discount }}% OFF</strong>!
+        </span>
+      </div>
+    </div>
+
+    <!-- Products Grid -->
+    <div class="bundle-builder__grid">
+      {%- for block in section.blocks -%}
+        {%- assign product = block.settings.product -%}
+        {%- if product != blank -%}
+          <div class="bundle-product-card" 
+               data-product-id="{{ product.id }}" 
+               data-block-id="{{ block.id }}" 
+               {{ block.shopify_attributes }}>
+            
+            <!-- Badges -->
+            {%- if block.settings.badge_label != blank -%}
+              <span class="bundle-product-card__badge">{{ block.settings.badge_label }}</span>
+            {%- endif -%}
+
+            <!-- Product Image -->
+            <div class="bundle-product-card__media">
+              {%- if product.featured_image -%}
+                <img src="{{ product.featured_image | image_url: width: 600 }}" 
+                     alt="{{ product.title | escape }}" 
+                     loading="lazy" 
+                     width="300" 
+                     height="300"
+                     class="bundle-product-card__img">
+              {%- else -%}
+                {{ 'product-2' | placeholder_svg_tag: 'bundle-product-card__placeholder' }}
+              {%- endif -%}
+            </div>
+
+            <!-- Product Details -->
+            <div class="bundle-product-card__info">
+              <!-- Rating Mock (US CRO staple) -->
+              <div class="bundle-product-card__rating">
+                <span class="stars">★★★★★</span>
+                <span class="rating-val">4.9</span>
+                <span class="reviews-count">({{ block.settings.review_count | default: '450+' }})</span>
+              </div>
+
+              <h3 class="bundle-product-card__title">{{ product.title }}</h3>
+
+              <div class="bundle-product-card__price-row">
+                <span class="bundle-product-card__price" data-base-price="{{ product.price }}">
+                  {{ product.price | money }}
+                </span>
+                {%- if product.compare_at_price > product.price -%}
+                  <s class="bundle-product-card__compare-price">{{ product.compare_at_price | money }}</s>
+                {%- endif -%}
+              </div>
+
+              <!-- Variant Selector (if multi-variants exist) -->
+              {%- unless product.has_only_default_variant -%}
+                <div class="bundle-product-card__variants">
+                  <label class="variant-label" for="VariantSelect-{{ block.id }}">Select Option:</label>
+                  <select id="VariantSelect-{{ block.id }}" class="bundle-product-card__variant-select" data-variant-select>
+                    {%- for variant in product.variants -%}
+                      <option value="{{ variant.id }}" 
+                              data-price="{{ variant.price }}" 
+                              data-available="{{ variant.available }}"
+                              {% unless variant.available %}disabled{% endunless %}
+                              {% if variant == product.selected_or_first_available_variant %}selected="selected"{% endif %}>
+                        {{ variant.title }} - {{ variant.price | money }} {% unless variant.available %}(Sold Out){% endunless %}
+                      </option>
+                    {%- endfor -%}
+                  </select>
+                </div>
+              {%- else -%}
+                <input type="hidden" data-variant-select value="{{ product.selected_or_first_available_variant.id }}" data-price="{{ product.price }}">
+              {%- endunless -%}
+
+              <!-- Quantity Controls inside Card -->
+              <div class="bundle-product-card__action">
+                <button type="button" class="bundle-product-card__btn-add" data-bundle-quick-add>
+                  + Add to Bundle
+                </button>
+                <div class="bundle-product-card__qty-control is-hidden" data-bundle-qty-control>
+                  <button type="button" class="bb-qty-btn bb-qty-minus" data-qty-minus aria-label="Decrease">&minus;</button>
+                  <span class="bb-qty-count" data-qty-count>1</span>
+                  <button type="button" class="bb-qty-btn bb-qty-plus" data-qty-plus aria-label="Increase">&#43;</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+
+    <!-- Sticky Live Bundle Summary & Checkout Bar -->
+    <div class="bundle-builder__summary-bar" data-bundle-summary-bar>
+      <div class="summary-bar__inner">
+        <!-- Left: Selected Count and Tier Info -->
+        <div class="summary-bar__meta">
+          <div class="summary-bar__count">
+            <span class="count-pill" data-summary-count>0</span> Items Selected
+          </div>
+          <div class="summary-bar__tier-status" data-summary-tier-status>
+            Select 2 items to get 10% OFF
+          </div>
+        </div>
+
+        <!-- Middle: Price & Savings calculation -->
+        <div class="summary-bar__pricing">
+          <div class="summary-bar__savings-badge is-hidden" data-summary-savings-badge>
+            Save <span data-summary-savings-amount>$0.00</span> (<span data-summary-savings-percent>0%</span>)
+          </div>
+          <div class="summary-bar__totals">
+            <s class="summary-bar__original-price is-hidden" data-summary-original-price>$0.00</s>
+            <span class="summary-bar__final-price" data-summary-final-price>$0.00</span>
+          </div>
+        </div>
+
+        <!-- Right: Action Button -->
+        <div class="summary-bar__cta-wrap">
+          <button type="button" class="bundle-builder__add-cart-btn" data-bundle-add-to-cart disabled>
+            <span class="btn-spinner"></span>
+            <span class="btn-text">Add Bundle to Cart</span>
+            <span class="btn-price" data-btn-bundle-price>$0.00</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Dynamic Bundle Builder",
+  "tag": "section",
+  "class": "section-bundle-builder",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow Text",
+      "default": "🎁 BUILD YOUR BUNDLE & SAVE BIG"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Section Heading",
+      "default": "Buy More, Save More Bundle"
+    },
+    {
+      "type": "textarea",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Mix and match any items below. The more you add, the more you save! Free US Shipping included on bundles over $75."
+    },
+    {
+      "type": "header",
+      "content": "Tier 1 Discount Settings"
+    },
+    {
+      "type": "number",
+      "id": "tier_1_qty",
+      "label": "Tier 1 Quantity (Min Items)",
+      "default": 2
+    },
+    {
+      "type": "number",
+      "id": "tier_1_discount",
+      "label": "Tier 1 Discount Percentage (%)",
+      "default": 10
+    },
+    {
+      "type": "header",
+      "content": "Tier 2 Discount Settings (Popular)"
+    },
+    {
+      "type": "number",
+      "id": "tier_2_qty",
+      "label": "Tier 2 Quantity",
+      "default": 3
+    },
+    {
+      "type": "number",
+      "id": "tier_2_discount",
+      "label": "Tier 2 Discount Percentage (%)",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "Tier 3 Discount Settings (Best Value)"
+    },
+    {
+      "type": "number",
+      "id": "tier_3_qty",
+      "label": "Tier 3 Quantity",
+      "default": 4
+    },
+    {
+      "type": "number",
+      "id": "tier_3_discount",
+      "label": "Tier 3 Discount Percentage (%)",
+      "default": 30
+    },
+    {
+      "type": "header",
+      "content": "Colors & Spacing"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color",
+      "default": "#10b981"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#f9fafb"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 20,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Top Padding",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 20,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Bottom Padding",
+      "default": 80
+    }
+  ],
+  "blocks": [
+    {
+      "type": "product_item",
+      "name": "Bundle Product",
+      "settings": [
+        {
+          "type": "product",
+          "id": "product",
+          "label": "Select Product"
+        },
+        {
+          "type": "text",
+          "id": "badge_label",
+          "label": "Card Badge (Optional)",
+          "default": "Bestseller"
+        },
+        {
+          "type": "text",
+          "id": "review_count",
+          "label": "Social Proof Reviews Count",
+          "default": "520+"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Conversion Suite Bundle Builder",
+      "blocks": [
+        { "type": "product_item" },
+        { "type": "product_item" },
+        { "type": "product_item" }
+      ]
+    }
+  ]
+}
+{% endschema %}
