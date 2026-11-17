@@ -1,0 +1,25 @@
+{
+  "name": "shopify-conversion-suite",
+  "version": "1.0.0",
+  "description": "Full-Stack High-Conversion Marketing Toolkit & Shopify App (OS 2.0)",
+  "main": "server/server.js",
+  "scripts": {
+    "start": "node server/server.js",
+    "dev": "node --watch server/server.js"
+  },
+  "keywords": [
+    "shopify",
+    "cro",
+    "bundle-builder",
+    "cart-drawer",
+    "countdown-timer",
+    "conversion-rate-optimization"
+  ],
+  "author": "yusufarifin100",
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2"
+  }
+}

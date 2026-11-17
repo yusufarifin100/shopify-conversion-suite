@@ -20,3 +20,5 @@ logs/
 # Editor directories
 .vscode/
 .idea/
+
+.vercel

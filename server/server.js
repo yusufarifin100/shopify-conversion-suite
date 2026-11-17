@@ -52,13 +52,15 @@ app.get('/admin', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'admin.html'));
 });
 
-// Start Server
-app.listen(PORT, () => {
-  console.log(`=======================================================`);
-  console.log(`🚀 Conversion Suite Backend Server is running!`);
-  console.log(`📡 URL: http://localhost:${PORT}`);
-  console.log(`📊 Merchant Dashboard: http://localhost:${PORT}/admin`);
-  console.log(`=======================================================`);
-});
+// Start Server only if run directly (local), otherwise exported for Vercel Serverless
+if (require.main === module || !process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`=======================================================`);
+    console.log(`🚀 Conversion Suite Backend Server is running!`);
+    console.log(`📡 URL: http://localhost:${PORT}`);
+    console.log(`📊 Merchant Dashboard: http://localhost:${PORT}/admin`);
+    console.log(`=======================================================`);
+  });
+}
 
 module.exports = app;
