@@ -6,10 +6,10 @@
       "bundle-builder": {
         "type": "bundle-builder",
         "blocks": {
-          "bundle-item-1": { "type": "product_item", "settings": { "product": "classic-cotton-tee", "badge_label": "Bestseller" } },
-          "bundle-item-2": { "type": "product_item", "settings": { "product": "everyday-hoodie", "badge_label": "Popular" } },
-          "bundle-item-3": { "type": "product_item", "settings": { "product": "canvas-tote-bag", "badge_label": "New" } },
-          "bundle-item-4": { "type": "product_item", "settings": { "product": "daily-cap", "badge_label": "Best Value" } }
+          "bundle-item-1": { "type": "product_item", "settings": { "product": "hydra-barrier-repair-serum", "badge_label": "Bestseller" } },
+          "bundle-item-2": { "type": "product_item", "settings": { "product": "vitamin-c-glow-elixir", "badge_label": "Clinical Strength" } },
+          "bundle-item-3": { "type": "product_item", "settings": { "product": "overnight-ceramide-recovery-cream", "badge_label": "Derm Recommended" } },
+          "bundle-item-4": { "type": "product_item", "settings": { "product": "amino-acid-balancing-cleanser", "badge_label": "Community Favorite" } }
         },
         "block_order": ["bundle-item-1", "bundle-item-2", "bundle-item-3", "bundle-item-4"],
         "settings": {}
