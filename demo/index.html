@@ -143,28 +143,57 @@
   <script>
     (function() {
       // In-memory simulated cart state
+      // Starts empty, like a real new visitor's cart.
       let mockCart = {
-        item_count: 1,
-        total_price: 3800,
+        item_count: 0,
+        total_price: 0,
         currency: 'USD',
-        items: [
-          {
-            key: 'item_1_mock',
-            id: 101,
-            title: 'Ultra Hydration Serum (50ml)',
-            product_title: 'Ultra Hydration Serum',
-            variant_title: '50ml Standard',
-            quantity: 1,
-            original_line_price: 3800,
-            final_line_price: 3800,
-            image: 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=200&auto=format&fit=crop&q=80',
-            properties: {
-              '_bundle_tier': 'Starter Bundle',
-              '_bundle_discount': '10%'
-            }
-          }
-        ]
+        items: []
       };
+
+      // Mirrors the store's automatic discounts: best tier wins, applied to bundle lines.
+      const TIERS = [
+        { qty: 4, pct: 30 },
+        { qty: 3, pct: 20 },
+        { qty: 2, pct: 10 }
+      ];
+
+      // Read product data (title, image, price, variant) from the bundle cards on the page,
+      // so the mock cart shows exactly what the customer picked.
+      function lookupVariant(id) {
+        const el = [...document.querySelectorAll('[data-variant-select] option, input[data-variant-select]')]
+          .find((o) => String(o.value) === String(id));
+        if (!el) return null;
+        const card = el.closest('.bundle-product-card');
+        const price = parseInt(el.dataset.price || card?.querySelector('[data-base-price]')?.dataset.basePrice || '0', 10);
+        const variantTitle = el.tagName === 'OPTION'
+          ? el.textContent.replace(/\s*-\s*\$[\d.,]+\s*$/, '').trim()
+          : 'Default';
+        return {
+          product_title: card?.querySelector('.bundle-product-card__title')?.textContent.trim() || 'Bundle Item',
+          image: card?.querySelector('img')?.src || '',
+          price,
+          variantTitle
+        };
+      }
+
+      // Recompute line prices and totals, applying the tier discount like Shopify would.
+      function recalc() {
+        const bundleQty = mockCart.items
+          .filter((i) => i.properties && i.properties._bundle_id)
+          .reduce((acc, i) => acc + i.quantity, 0);
+        const pct = (TIERS.find((t) => bundleQty >= t.qty) || { pct: 0 }).pct;
+
+        mockCart.items.forEach((i) => {
+          const isBundle = i.properties && i.properties._bundle_id;
+          i.original_line_price = i.unit_price * i.quantity;
+          i.final_line_price = isBundle
+            ? Math.round((i.original_line_price * (100 - pct)) / 100)
+            : i.original_line_price;
+        });
+        mockCart.item_count = mockCart.items.reduce((acc, i) => acc + i.quantity, 0);
+        mockCart.total_price = mockCart.items.reduce((acc, i) => acc + i.final_line_price, 0);
+      }
 
       const originalFetch = window.fetch;
       window.fetch = async function(url, options = {}) {
@@ -190,43 +219,46 @@
 
           if (payload.items && Array.isArray(payload.items)) {
             payload.items.forEach((item, idx) => {
+              const qty = parseInt(item.quantity || '1', 10);
               const existing = mockCart.items.find(i => i.id == item.id);
               if (existing) {
-                existing.quantity += item.quantity;
-                existing.final_line_price = existing.quantity * (existing.final_line_price / (existing.quantity - item.quantity));
+                existing.quantity += qty;
               } else {
+                const v = lookupVariant(item.id);
                 mockCart.items.push({
                   key: 'mock_' + Date.now() + '_' + idx,
                   id: item.id,
-                  title: 'Selected Bundle Item #' + item.id,
-                  product_title: 'Custom Curated Product',
-                  variant_title: 'Selected Option',
-                  quantity: item.quantity,
-                  original_line_price: 3200 * item.quantity,
-                  final_line_price: 3200 * item.quantity,
-                  image: 'https://images.unsplash.com/photo-1571781926291-c477ebfd024b?w=200&auto=format&fit=crop&q=80',
+                  title: (v ? v.product_title : 'Bundle Item') + (v ? ' (' + v.variantTitle + ')' : ''),
+                  product_title: v ? v.product_title : 'Bundle Item',
+                  variant_title: v ? v.variantTitle : 'Default',
+                  quantity: qty,
+                  unit_price: v ? v.price : 0,
+                  image: v ? v.image : '',
                   properties: item.properties || {}
                 });
               }
             });
           } else if (payload.id) {
-            mockCart.items.push({
-              key: 'mock_' + Date.now(),
-              id: payload.id,
-              title: 'Express Glow Booster',
-              product_title: 'Express Glow Booster',
-              variant_title: 'Single Pack',
-              quantity: payload.quantity || 1,
-              original_line_price: 1900,
-              final_line_price: 1900,
-              image: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=200&auto=format&fit=crop&q=80',
-              properties: payload.properties || {}
-            });
+            const qty = parseInt(payload.quantity || '1', 10);
+            const existing = mockCart.items.find(i => i.id == payload.id);
+            if (existing) {
+              existing.quantity += qty;
+            } else {
+              mockCart.items.push({
+                key: 'mock_' + Date.now(),
+                id: payload.id,
+                title: 'Express Glow Booster',
+                product_title: 'Express Glow Booster',
+                variant_title: 'Single Pack',
+                quantity: qty,
+                unit_price: 1900,
+                image: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=200&auto=format&fit=crop&q=80',
+                properties: payload.properties || {}
+              });
+            }
           }
 
-          // Recalculate cart totals
-          mockCart.item_count = mockCart.items.reduce((acc, curr) => acc + curr.quantity, 0);
-          mockCart.total_price = mockCart.items.reduce((acc, curr) => acc + curr.final_line_price, 0);
+          recalc();
 
           return new Response(JSON.stringify(mockCart), {
             status: 200,
@@ -244,16 +276,10 @@
             mockCart.items = mockCart.items.filter(i => i.key !== targetKey);
           } else {
             const item = mockCart.items.find(i => i.key === targetKey);
-            if (item) {
-              const unitPrice = item.final_line_price / item.quantity;
-              item.quantity = newQty;
-              item.final_line_price = unitPrice * newQty;
-              item.original_line_price = unitPrice * newQty;
-            }
+            if (item) item.quantity = newQty;
           }
 
-          mockCart.item_count = mockCart.items.reduce((acc, curr) => acc + curr.quantity, 0);
-          mockCart.total_price = mockCart.items.reduce((acc, curr) => acc + curr.final_line_price, 0);
+          recalc();
 
           return new Response(JSON.stringify(mockCart), {
             status: 200,
