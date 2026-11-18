@@ -1,15 +1,15 @@
 # Shopify App CLI Configuration Manifest
 # Learn more at: https://shopify.dev/docs/apps/tools/cli/configuration
 
-client_id = "mock_api_key_conversion_suite"
-name = "shopify-conversion-suite"
-handle = "shopify-conversion-suite"
+client_id = "858c4c20dbdd7d4e00d0caab447f3fec"
+name = "conversion-suite"
+handle = "conversion-suite"
 application_url = "http://localhost:3000"
 embedded = true
 
 [build]
 automatically_update_urls_on_dev = true
-dev_store_url = "quickstart-demo.myshopify.com"
+dev_store_url = "aya-store-b729lzvt.myshopify.com"
 
 [access_scopes]
 # Required permissions for discounts, orders, products, and analytics
