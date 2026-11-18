@@ -68,6 +68,11 @@
       padding: 0.2rem 0.5rem;
       border-radius: 9999px;
       border: 1px solid #a7f3d0;
+      white-space: nowrap;
+    }
+    /* On narrow screens the tag wrapped to three lines and crowded the header. */
+    @media (max-width: 520px) {
+      .demo-brand-tag { display: none; }
     }
     .demo-cart-trigger {
       display: inline-flex;
