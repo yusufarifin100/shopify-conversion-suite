@@ -7,7 +7,7 @@
     <meta name="theme-color" content="#0f172a">
     <link rel="canonical" href="{{ canonical_url }}">
 
-    <title>{{ page_title }} &ndash; {{ shop.name }}</title>
+    <title>{% if template == 'index' %}{{ shop.name }}{% else %}{{ page_title }} &ndash; {{ shop.name }}{% endif %}</title>
 
     {%- if page_description -%}
       <meta name="description" content="{{ page_description | escape }}">
