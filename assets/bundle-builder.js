@@ -303,6 +303,11 @@
       } finally {
         btn.disabled = false;
         btn.innerHTML = originalText;
+        // innerHTML replaced the price node, so re-bind it and refresh;
+        // otherwise later recalculations update a detached element and the
+        // button keeps showing the price from the moment it was clicked.
+        this.btnBundlePrice = btn.querySelector('[data-btn-bundle-price]');
+        this.recalculate();
       }
     }
   }
