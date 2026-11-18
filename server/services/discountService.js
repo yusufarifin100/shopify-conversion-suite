@@ -12,7 +12,18 @@ class DiscountService {
    */
   async syncTierDiscounts(shopDomain) {
     const tiers = db.table('bundle_tiers').find((t) => t.shop_domain === shopDomain);
-    const shopify = new ShopifyClient(shopDomain);
+    if (tiers.length === 0) {
+      throw new Error(`No bundle tiers configured for ${shopDomain}`);
+    }
+
+    // Prefer a real Admin API token from the environment; fall back to the
+    // merchant record (the seeded demo token puts the client in mock mode).
+    const merchant = db.table('merchants').findOne((m) => m.shop_domain === shopDomain);
+    const shopify = new ShopifyClient(
+      shopDomain,
+      process.env.SHOPIFY_ADMIN_ACCESS_TOKEN || merchant?.access_token
+    );
+    const simulated = shopify.isMock();
     const results = [];
 
     for (const tier of tiers) {
@@ -62,13 +73,24 @@ class DiscountService {
 
       try {
         const response = await shopify.graphql(mutation, variables);
-        const node = response?.discountAutomaticBasicCreate?.automaticDiscountNode;
+        const payload = response?.discountAutomaticBasicCreate;
+        const userErrors = payload?.userErrors || [];
+
+        if (userErrors.length > 0) {
+          results.push({
+            tierId: tier.id,
+            title: discountTitle,
+            error: userErrors.map((e) => e.message).join('; ')
+          });
+          continue;
+        }
 
         results.push({
           tierId: tier.id,
           title: discountTitle,
-          shopifyDiscountId: node?.id || `simulated_${Date.now()}`,
-          status: 'ACTIVE'
+          shopifyDiscountId: payload?.automaticDiscountNode?.id,
+          status: 'ACTIVE',
+          simulated
         });
       } catch (err) {
         console.error(`Failed to sync discount for Tier ${tier.tier_number}:`, err);

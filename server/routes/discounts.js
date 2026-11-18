@@ -12,9 +12,23 @@ router.post('/sync', async (req, res) => {
 
   try {
     const syncResults = await discountService.syncTierDiscounts(shop);
+
+    const failed = syncResults.filter((r) => r.error);
+    if (failed.length > 0) {
+      return res.status(502).json({
+        success: false,
+        error: `${failed.length} of ${syncResults.length} tiers failed: ${failed[0].error}`,
+        results: syncResults
+      });
+    }
+
+    const simulated = syncResults.every((r) => r.simulated);
     res.json({
       success: true,
-      message: 'Shopify Automatic Discounts synchronized successfully',
+      simulated,
+      message: simulated
+        ? 'Demo mode: no Shopify Admin token configured, so no real discounts were created'
+        : 'Shopify Automatic Discounts synchronized successfully',
       results: syncResults
     });
   } catch (err) {
