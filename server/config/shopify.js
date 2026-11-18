@@ -10,13 +10,22 @@ class ShopifyClient {
     this.apiVersion = '2025-01';
   }
 
+  /** True when running against the built-in demo token instead of a real store. */
+  isMock() {
+    return Boolean(this.accessToken?.startsWith('shpat_demo_') || !this.shop);
+  }
+
   async graphql(query, variables = {}) {
     const endpoint = `https://${this.shop}/admin/api/${this.apiVersion}/graphql.json`;
 
     // In development/mock mode without active store credentials
-    if (this.accessToken?.startsWith('shpat_demo_') || !this.shop) {
+    if (this.isMock()) {
       console.log(`[Shopify GraphQL Mock] Query called on ${this.shop}`);
       return this.mockResponse(query, variables);
+    }
+
+    if (!this.accessToken) {
+      throw new Error('SHOPIFY_ADMIN_ACCESS_TOKEN is not set, cannot call the Shopify Admin API');
     }
 
     const response = await fetch(endpoint, {

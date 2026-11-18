@@ -454,11 +454,16 @@
       try {
         const res = await fetch('/api/discounts/sync', { method: 'POST' });
         const data = await res.json();
-        if (data.success) {
+        if (data.success && data.simulated) {
+          showToast('ℹ️ Demo mode: no Shopify Admin token configured, nothing was created');
+        } else if (data.success) {
           showToast('🎉 Shopify Automatic Discounts Synchronized Successfully!');
+        } else {
+          showToast('⚠️ Sync failed: ' + (data.error || 'unknown error'));
         }
       } catch (e) {
         console.error(e);
+        showToast('⚠️ Sync failed: could not reach the server');
       } finally {
         btn.disabled = false;
         btn.textContent = '🚀 Sync to Shopify Discounts';
