@@ -1,6 +1,18 @@
 {
   "current": {
     "free_shipping_threshold": 7500,
-    "enable_cart_upsell": true
+    "enable_cart_upsell": true,
+    "sections": {
+      "bundle-builder": {
+        "type": "bundle-builder",
+        "blocks": {
+          "bundle-item-1": { "type": "product_item", "settings": { "badge_label": "Bestseller" } },
+          "bundle-item-2": { "type": "product_item", "settings": { "badge_label": "Popular" } },
+          "bundle-item-3": { "type": "product_item", "settings": { "badge_label": "New" } }
+        },
+        "block_order": ["bundle-item-1", "bundle-item-2", "bundle-item-3"],
+        "settings": {}
+      }
+    }
   }
 }
