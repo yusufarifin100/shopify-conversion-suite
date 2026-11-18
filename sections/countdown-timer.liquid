@@ -35,7 +35,10 @@
 
       <!-- Main Heading & Subheading -->
       <div class="countdown-banner__text-wrap">
-        <h2 class="countdown-banner__heading">{{ section.settings.heading }}</h2>
+        {%- comment -%} The homepage needs exactly one h1; other templates keep h2. {%- endcomment -%}
+        {%- assign heading_tag = 'h2' -%}
+        {%- if request.page_type == 'index' -%}{%- assign heading_tag = 'h1' -%}{%- endif -%}
+        <{{ heading_tag }} class="countdown-banner__heading">{{ section.settings.heading }}</{{ heading_tag }}>
         {%- if section.settings.subheading != blank -%}
           <p class="countdown-banner__subheading">{{ section.settings.subheading }}</p>
         {%- endif -%}
