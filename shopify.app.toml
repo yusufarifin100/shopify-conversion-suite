@@ -1,34 +1,35 @@
 # Shopify App CLI Configuration Manifest
 # Learn more at: https://shopify.dev/docs/apps/tools/cli/configuration
 
-client_id = "mock_api_key_conversion_suite"
-name = "shopify-conversion-suite"
-handle = "shopify-conversion-suite"
-application_url = "http://localhost:3000"
+client_id = "858c4c20dbdd7d4e00d0caab447f3fec"
+name = "conversion-suite"
+handle = "aya-conversion-suite"
+application_url = "https://shopify-conversion-suite-peach.vercel.app"
 embedded = true
 
 [build]
 automatically_update_urls_on_dev = true
-dev_store_url = "quickstart-demo.myshopify.com"
+dev_store_url = "aya-store-b729lzvt.myshopify.com"
 
 [access_scopes]
 # Required permissions for discounts, orders, products, and analytics
-scopes = "read_products,write_products,read_orders,write_discounts,read_discounts"
+scopes = "read_products,write_products,read_orders,write_discounts,read_discounts,write_app_proxy"
 
 [auth]
 redirect_urls = [
-  "http://localhost:3000/auth/callback",
-  "http://localhost:3000/auth/shopify/callback"
+  "https://shopify-conversion-suite-peach.vercel.app/auth/callback",
+  "https://shopify-conversion-suite-peach.vercel.app/auth/shopify/callback"
 ]
 
 [webhooks]
 api_version = "2025-01"
 
-  [[webhooks.subscriptions]]
-  topics = [ "orders/paid" ]
-  uri = "/webhooks/orders-paid"
+  # Disabled until Protected Customer Data access is approved in Dev Dashboard:
+  # [[webhooks.subscriptions]]
+  # topics = [ "orders/paid" ]
+  # uri = "/webhooks/orders-paid"
 
 [app_proxy]
-url = "http://localhost:3000/api"
+url = "https://shopify-conversion-suite-peach.vercel.app/api"
 prefix = "apps"
 subpath = "conversion-suite"
