@@ -11,7 +11,7 @@ const DB_FILE = path.join(__dirname, 'data.json');
 const INITIAL_STATE = {
   merchants: [
     {
-      shop_domain: 'quickstart-demo.myshopify.com',
+      shop_domain: 'aya-store-b729lzvt.myshopify.com',
       access_token: 'shpat_demo_conversion_suite_token',
       free_shipping_threshold: 7500, // $75.00
       enable_cart_upsell: true,
@@ -23,7 +23,7 @@ const INITIAL_STATE = {
   bundle_tiers: [
     {
       id: 1,
-      shop_domain: 'quickstart-demo.myshopify.com',
+      shop_domain: 'aya-store-b729lzvt.myshopify.com',
       tier_number: 1,
       min_quantity: 2,
       discount_percentage: 10,
@@ -33,7 +33,7 @@ const INITIAL_STATE = {
     },
     {
       id: 2,
-      shop_domain: 'quickstart-demo.myshopify.com',
+      shop_domain: 'aya-store-b729lzvt.myshopify.com',
       tier_number: 2,
       min_quantity: 3,
       discount_percentage: 20,
@@ -43,7 +43,7 @@ const INITIAL_STATE = {
     },
     {
       id: 3,
-      shop_domain: 'quickstart-demo.myshopify.com',
+      shop_domain: 'aya-store-b729lzvt.myshopify.com',
       tier_number: 3,
       min_quantity: 4,
       discount_percentage: 30,
@@ -55,7 +55,7 @@ const INITIAL_STATE = {
   analytics_events: [
     {
       id: 'evt_1',
-      shop_domain: 'quickstart-demo.myshopify.com',
+      shop_domain: 'aya-store-b729lzvt.myshopify.com',
       event_type: 'order_completed',
       order_id: '1001',
       total_price: 114.00,
@@ -66,7 +66,7 @@ const INITIAL_STATE = {
     },
     {
       id: 'evt_2',
-      shop_domain: 'quickstart-demo.myshopify.com',
+      shop_domain: 'aya-store-b729lzvt.myshopify.com',
       event_type: 'order_completed',
       order_id: '1002',
       total_price: 88.00,
@@ -77,7 +77,7 @@ const INITIAL_STATE = {
     },
     {
       id: 'evt_3',
-      shop_domain: 'quickstart-demo.myshopify.com',
+      shop_domain: 'aya-store-b729lzvt.myshopify.com',
       event_type: 'order_completed',
       order_id: '1003',
       total_price: 145.00,
